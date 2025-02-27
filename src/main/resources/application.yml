@@ -23,10 +23,13 @@ spring:
   config:
     activate:
       on-profile: dev
+    import: optional:file:.env[.properties]
+    
   data:
     mongodb:
-      uri: mongodb+srv://orihuelaoluis:mQTJY7z8xJFuus3o@cluster1.6qhmb.mongodb.net/control-ventas?retryWrites=true&w=majority&appName=Cluster1
- 
+      uri: mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster1.6qhmb.mongodb.net/${MONGO_DATABASE}?retryWrites=true&w=majority&appName=Cluster1
+    
+    
 springdoc:     
   swagger-ui:
     path: /swagger-ui-custom.html
