@@ -18,21 +18,13 @@ public class Venta {
 
 	@Id
 	private String id;
-	private List<ItemVenta> productos_vendidos;
+	private List<Producto> productos_vendidos;
 	private double monto_total;
+	private String metodo_pago;
 	private double dinero_cliente;
 	private double vuelto;
 	private LocalDateTime fecha_compra;
 	
 }
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class ItemVenta{
-	
-	private String nombre_producto;
-	private int cantidad;
-	private double precio_unitario;
-	private double subtotal;
-}
+
 

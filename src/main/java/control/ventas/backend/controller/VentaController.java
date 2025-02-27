@@ -1,5 +1,6 @@
 package control.ventas.backend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import control.ventas.backend.dto.ProductoDTO;
+import control.ventas.backend.dto.VentaDTO;
+import control.ventas.backend.entity.Producto;
 import control.ventas.backend.entity.Venta;
 import control.ventas.backend.service.VentaService;
 
@@ -43,13 +47,39 @@ public class VentaController {
 	}
 
 	@PostMapping("/register")
-	public ResponseEntity<?> registerVenta(@RequestBody Venta venta) {
+	public ResponseEntity<?> registerVenta(@RequestBody VentaDTO ventaDTO) {
 
 		try {
+			
+			Venta ventaNueva = new Venta();
+	        ventaNueva.setMetodo_pago(ventaDTO.getMetodo_pago());
+	        ventaNueva.setDinero_cliente(ventaDTO.getDinero_cliente());
+	        ventaNueva.setFecha_compra(ventaDTO.getFecha_compra());
 
-			Venta ventaNueva = ventaService.registerVenta(venta);
-			logger.info("Venta creada {}", ventaNueva);
-			return new ResponseEntity<>(ventaNueva, HttpStatus.CREATED);
+	        // Cálculos de subtotal y total
+	        double montoTotal = 0;
+	        List<Producto> productosVendidos = new ArrayList<>();
+	        
+	        for (ProductoDTO productoDTO : ventaDTO.getProductos_vendidos()) {
+	            Producto producto = new Producto();
+	            producto.setNombre_producto(productoDTO.getNombre_producto());
+	            producto.setCantidad(productoDTO.getCantidad());
+	            producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
+
+	            // Calculamos subtotal por producto
+	            double subtotal = productoDTO.getCantidad() * productoDTO.getPrecio_unitario();
+	            producto.setSubtotal(subtotal);
+	            montoTotal += subtotal;
+	            productosVendidos.add(producto);
+	        }
+
+	        ventaNueva.setProductos_vendidos(productosVendidos);
+	        ventaNueva.setMonto_total(montoTotal);
+	        ventaNueva.setVuelto(ventaNueva.getDinero_cliente() - montoTotal);
+
+	        ventaService.registerVenta(ventaNueva);
+	        logger.info("Venta creada {}", ventaNueva);
+	        return new ResponseEntity<>(ventaNueva, HttpStatus.CREATED);
 
 		} catch (Exception e) {
 			logger.error("Error al crear la venta", e);

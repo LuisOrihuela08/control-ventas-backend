@@ -1,4 +1,5 @@
-package control.ventas.backend.entity;
+package control.ventas.backend.dto;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -6,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Producto {
+public class ProductoDTO {
 
 	private String nombre_producto;
-	private int cantidad;
-	private double precio_unitario;
-	private double subtotal;
+    private int cantidad;
+    private double precio_unitario;
 }
