@@ -1,5 +1,8 @@
 package control.ventas.backend.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -7,14 +10,22 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 
 import control.ventas.backend.dto.ProductoDTO;
 import control.ventas.backend.dto.VentaDTO;
@@ -86,6 +97,71 @@ public class VentaController {
 			return new ResponseEntity<>(Map.of("error", "Error al crear la venta", "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	 @GetMapping("/export/pdf/{id}")
+	    public ResponseEntity<InputStreamResource> exportVentaToPDF(@PathVariable("id") String id) {
+	        try {
+	            Venta venta = ventaService.findVentaById(id);
+
+	            if (venta == null) {
+	                return ResponseEntity.notFound().build();
+	            }
+
+	            ByteArrayOutputStream out = new ByteArrayOutputStream();
+	            Document document = new Document();
+	            PdfWriter.getInstance(document, out);
+
+	            document.open();
+	            document.add(new Paragraph("**************************************************"));
+	            document.add(new Paragraph("**************************************************"));
+	            document.add(new Paragraph("                BOLETA DE COMPRA                  "));
+	            document.add(new Paragraph("**************************************************"));
+	            document.add(new Paragraph("**************************************************"));
+	            document.add(new Paragraph("                  Tienda Luiz S.A.C                  "));
+	            document.add(new Paragraph("                    4250125244                      "));
+	            document.add(new Paragraph("      Mz L3 Lt35 CHACLACAYO - LIMA           "));
+	            document.add(new Paragraph("               Tienda Luiz S.A.C                  "));
+	            document.add(new Paragraph("        Fecha: " + venta.getFecha_compra().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+	      
+	            document.add(new Paragraph("---------------------------------------------------------"));
+	            document.add(new Paragraph("Productos:"));
+	            venta.getProductos_vendidos().forEach(producto -> {
+	                try {
+	                    document.add(new Paragraph(producto.getNombre_producto() + " - Cant: " + producto.getCantidad() + 
+	                            " x S/." + producto.getPrecio_unitario() + " = S/." + (producto.getCantidad() * producto.getPrecio_unitario())));
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+	            });
+
+	            document.add(new Paragraph("---------------------------------------------------------"));
+	            document.add(new Paragraph("Monto Total: S/." + venta.getMonto_total()));
+	            document.add(new Paragraph("Dinero Cliente: S/." + venta.getDinero_cliente()));
+	            document.add(new Paragraph("Método de pago: " + venta.getMetodo_pago()));
+	            document.add(new Paragraph("Vuelto: S/." + venta.getVuelto()));
+	            document.add(new Paragraph("**************************************************"));
+	            document.add(new Paragraph("**************************************************"));
+	            document.add(new Paragraph("                Gracias por su compra             "));
+	            document.add(new Paragraph("**************************************************"));
+	            document.add(new Paragraph("**************************************************"));
+	            
+	            document.close();
+
+	            ByteArrayInputStream bis = new ByteArrayInputStream(out.toByteArray());
+	            HttpHeaders headers = new HttpHeaders();
+	            headers.add("Content-Disposition", "attachment; filename=boleta-compra.pdf");
+
+	            return ResponseEntity.ok()
+	                    .headers(headers)
+	                    .contentType(MediaType.APPLICATION_PDF)
+	                    .body(new InputStreamResource(bis));
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.internalServerError().build();
+	        }
+	    }
+	
+	
 
 	@GetMapping("/find-venta/{id}")
 	public ResponseEntity<?> getVentaById(@PathVariable("id") String id) {
