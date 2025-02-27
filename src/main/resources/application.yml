@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: control-ventas-backend
+  profiles:
+    active:
+    - dev  
+  
+      
+---
+# Configuración para el perfil 'default'
+spring:
+  config:
+    activate:
+      on-profile: default
+ 
+springdoc:     
+  swagger-ui:
+    path: /swagger-ui-custom.html
+
+---
+# Configuración para el perfil 'dev'
+spring:
+  config:
+    activate:
+      on-profile: dev
+  data:
+    mongodb:
+      uri: mongodb+srv://orihuelaoluis:mQTJY7z8xJFuus3o@cluster1.6qhmb.mongodb.net/control-ventas?retryWrites=true&w=majority&appName=Cluster1
+ 
+springdoc:     
+  swagger-ui:
+    path: /swagger-ui-custom.html
+
+---
+# Configuración para el perfil 'prod'
+spring:
+  config:
+    activate:
+      on-profile: prod
+ 
+springdoc:    
+  swagger-ui:
+    path: /swagger-ui-custom.html
