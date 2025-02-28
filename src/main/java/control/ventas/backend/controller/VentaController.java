@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,13 +22,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lowagie.text.Document;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
-import com.lowagie.text.Table;
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Font;
 import com.lowagie.text.Element;
@@ -64,6 +66,22 @@ public class VentaController {
 			return new ResponseEntity<>(Map.of("error", "Error al listar las ventas", "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	//Listar ventas con paginacion
+	@GetMapping("/list-venta-page")
+	public ResponseEntity<?> getVentasByPage(@RequestParam("page") int page, @RequestParam ("size") int size){
+		
+		try {
+			
+			Page<Venta> listVentasByPage = ventaService.listVentaByPages(page, size);
+			logger.info("Ventas paginadas OK");
+			return new ResponseEntity<>(listVentasByPage, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			logger.error("ERROR al listar ventas paginadas", e);
+			return new ResponseEntity<>(Map.of("error", "Hubo un error al listar ventas paginadas", "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@PostMapping("/register")
 	public ResponseEntity<?> registerVenta(@RequestBody VentaDTO ventaDTO) {
@@ -73,7 +91,7 @@ public class VentaController {
 			Venta ventaNueva = new Venta();
 	        ventaNueva.setMetodo_pago(ventaDTO.getMetodo_pago());
 	        ventaNueva.setDinero_cliente(ventaDTO.getDinero_cliente());
-	        ventaNueva.setFecha_compra(ventaDTO.getFecha_compra());
+	        ventaNueva.setFechaCompra(ventaDTO.getFecha_compra());
 
 	        // Cálculos de subtotal y total
 	        double montoTotal = 0;
@@ -212,7 +230,7 @@ public class VentaController {
 	        document.add(new Paragraph("RUC: 4250125244", infoFont));
 	        document.add(new Paragraph("Mz L3 Lt35 Los Alamos", infoFont));
 	        document.add(new Paragraph("CHACLACAYO - LIMA", infoFont));
-	        document.add(new Paragraph("Fecha: " + venta.getFecha_compra().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), infoFont));
+	        document.add(new Paragraph("Fecha: " + venta.getFechaCompra().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), infoFont));
 	        document.add(Chunk.NEWLINE);
 
 	        // Tabla de Productos
@@ -309,6 +327,31 @@ public class VentaController {
 		} catch (Exception e) {
 			logger.error("Error al encontrar la venta {}", e);
 			return new ResponseEntity<>(Map.of("error", "Error al encontrar la venta", "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	//Método para buscar ventas entre fechas
+	@GetMapping("/buscar-por-fecha")
+	public ResponseEntity<?> getVentasBetweenFecha(@RequestParam("fechaInicio") String  fechaInicio, @RequestParam ("fechaFin") String  fechaFin){
+		
+		try {
+			
+			if (fechaInicio == null || fechaFin == null) {
+				return new ResponseEntity<>(Map.of("error", "Por favor ingrese ambas fechas"), HttpStatus.BAD_REQUEST);
+			}
+			
+			List<Venta> ventas = ventaService.findVentasBetweenFecha(fechaInicio, fechaFin);
+			
+			if (ventas.isEmpty()) {
+	            return new ResponseEntity<>(Map.of("mensaje", "No se encontraron ventas en el rango de fechas"), HttpStatus.NOT_FOUND);
+	        }
+			
+			logger.info("Busqueda exitosa");
+			return ResponseEntity.ok(ventas);
+		
+		} catch (Exception e) {
+			logger.error("Error en el filtro buscar-por-fecha", e);
+			return new ResponseEntity<>(Map.of("error", "Error al filtrar las ventas por las fechas", "detalles", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

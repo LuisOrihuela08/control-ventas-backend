@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +24,8 @@ public class Venta {
 	private String metodo_pago;
 	private double dinero_cliente;
 	private double vuelto;
-	private LocalDateTime fecha_compra;
+	@Field("fecha_compra")
+	private LocalDateTime fechaCompra;
 	
 }
 
