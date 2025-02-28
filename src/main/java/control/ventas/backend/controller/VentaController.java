@@ -258,7 +258,11 @@ public class VentaController {
 	        Paragraph dineroCliente = new Paragraph("Dinero Cliente: S/." + venta.getDinero_cliente(), montosFont);
 	        dineroCliente.setAlignment(Element.ALIGN_RIGHT);
 	        document.add(dineroCliente);
-
+	        
+	        Paragraph metodoPago = new Paragraph("Método de pago: " + venta.getMetodo_pago(), montosFont);
+	        metodoPago.setAlignment(Element.ALIGN_RIGHT);
+	        document.add(metodoPago);
+	        
 	        Paragraph vuelto = new Paragraph("Vuelto: S/." + venta.getVuelto(), montosFont);
 	        vuelto.setAlignment(Element.ALIGN_RIGHT);
 	        document.add(vuelto);
