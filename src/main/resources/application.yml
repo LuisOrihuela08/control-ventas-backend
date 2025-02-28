@@ -3,7 +3,7 @@ spring:
     name: control-ventas-backend
   profiles:
     active:
-    - prod  
+    - dev  
   
       
 ---
@@ -22,7 +22,7 @@ springdoc:
 spring:
   config:
     activate:
-      on-profile: dev
+      on-profile: prod
     import: optional:file:.env[.properties]
     
   data:
@@ -39,7 +39,7 @@ springdoc:
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: dev
     import: optional:file:.env[.properties]
 
   data:
