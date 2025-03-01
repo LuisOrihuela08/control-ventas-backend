@@ -217,7 +217,7 @@ public class VentaController {
 	        tableEncabezado.setWidths(new float[]{50, 50});
 
 	        // Título centrado que ocupa las dos columnas
-	        PdfPCell header0 = new PdfPCell(new Paragraph("BOLETA DE COMPRA", titleFont));
+	        PdfPCell header0 = new PdfPCell(new Paragraph("NOTA DE VENTA", titleFont));
 	        header0.setColspan(2); // Ocupa las dos columnas
 	        header0.setBackgroundColor(new Color(63, 169, 219)); // 0, 102, 204 Azul oscuro
 	        header0.setHorizontalAlignment(Element.ALIGN_CENTER);
