@@ -18,7 +18,7 @@ springdoc:
     path: /swagger-ui-custom.html
 
 ---
-# Configuración para el perfil 'dev'
+# Configuración para el perfil 'prod'
 spring:
   config:
     activate:
@@ -35,7 +35,7 @@ springdoc:
     path: /swagger-ui-custom.html
 
 ---
-# Configuración para el perfil 'prod'
+# Configuración para el perfil 'dev'
 spring:
   config:
     activate:
