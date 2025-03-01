@@ -24,6 +24,9 @@ jobs: #conjunto de tareas
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Dando permisos de ejecucion para Maven Wrapper
+        run: chmod +x ./mvnw
+
       - name: Build JAR
         run: ./mvnw clean package
 
