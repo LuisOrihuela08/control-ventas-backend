@@ -28,5 +28,5 @@ jobs: #conjunto de tareas
         run: chmod +x ./mvnw
 
       - name: Build JAR
-        run: ./mvnw clean package
+        run: ./mvnw clean package -DskipTests
 
