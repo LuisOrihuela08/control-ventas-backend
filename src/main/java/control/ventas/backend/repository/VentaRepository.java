@@ -12,7 +12,6 @@ import control.ventas.backend.entity.Venta;
 public interface VentaRepository extends MongoRepository<Venta, String>{
 
 	//Método para filtro ventas por fecha
-	//@Query("{'fecha_compra': {$gte: ?0, $lt: ?}}")
 	List<Venta> findVentaByFechaCompraBetween(LocalDateTime fechaInicio, LocalDateTime fechaFin);
 
 	//Paginar las ventas
