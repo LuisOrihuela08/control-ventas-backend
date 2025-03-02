@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: control.ventas.backend.ControlVentasBackendApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.962 s -- in control.ventas.backend.ControlVentasBackendApplicationTests
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.999 s -- in control.ventas.backend.ControlVentasBackendApplicationTests

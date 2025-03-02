@@ -34,12 +34,14 @@ class ControlVentasBackendApplicationTests {
 	//}
 	
 	//Esto es para configurar pruebas unitarias con JUnit y Mockito
+	
+	//Test para registrar una venta
 	@Test
 	public void testRegistrarVenta() {
 
 		//Simulacion de registros
 		List<Producto> productos = Arrays.asList(new Producto("Laptop", 10, 35.0, "Lenovo"),
-				new Producto("Parlantes", 15, 35.0, "Lenovo"));
+												 new Producto("Parlantes", 15, 35.0, "Lenovo"));
 
 		Venta venta = new Venta("1", productos, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now());
 		
@@ -68,4 +70,36 @@ class ControlVentasBackendApplicationTests {
         Mockito.verify(ventaRepository, Mockito.times(1)).save(venta);
         
 	}	
+	
+	//Test para listar las ventas
+	@Test
+	public void testListarVentas() {
+		
+		List<Producto> producto1 = Arrays.asList(new Producto("Laptop", 10, 35.0, "Lenovo"));
+		List<Producto> producto2 = Arrays.asList(new Producto("Parlantes", 15, 35.0, "Lenovo"));
+		
+		Venta venta1 = new Venta("1", producto1, 3000.0, "Efectivo", 3100.0, 100.0, LocalDateTime.now());
+		Venta venta2 = new Venta("2", producto2, 250.0, "Tarjeta", 250.0, 0.0, LocalDateTime.now());
+		
+		List<Venta> listVentasTest = Arrays.asList(venta1, venta2);
+		
+		Mockito.when(ventaRepository.findAll()).thenReturn(listVentasTest);
+		
+		List<Venta> resultadoTestList = ventaService.findAllVentas();
+				
+		System.setProperty("org.mockito.logging.level", "DEBUG");
+		
+		System.out.println("Lista de las ventas: " + resultadoTestList);
+		
+		// Validaciones
+	    assertNotNull(resultadoTestList);
+	    assertEquals(2, resultadoTestList.size());
+	    assertEquals("Efectivo", resultadoTestList.get(0).getMetodo_pago());
+	    assertEquals("Tarjeta", resultadoTestList.get(1).getMetodo_pago());
+
+	    // Verificar que se llamó a findAll() exactamente una vez
+	    Mockito.verify(ventaRepository, Mockito.times(1)).findAll();
+	}
+	
+	
 }
