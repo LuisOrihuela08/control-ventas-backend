@@ -27,6 +27,9 @@ jobs: #conjunto de tareas
       - name: Dando permisos de ejecucion para Maven Wrapper
         run: chmod +x ./mvnw
 
-      - name: Build JAR
-        run: ./mvnw clean package
+      - name: Run Tests
+        run: ./mvnw test
+
+      - name: Build JAR (sin omitir tests)
+        run: ./mvnw clean package -DskipTests=false
 
