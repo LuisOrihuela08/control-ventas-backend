@@ -1,0 +1,12 @@
+control\ventas\backend\entity\Venta.class
+control\ventas\backend\service\ProductoService.class
+control\ventas\backend\dto\ProductoDTO.class
+control\ventas\backend\controller\ProductoController.class
+control\ventas\backend\repository\ProductoRepository.class
+control\ventas\backend\controller\VentaController.class
+control\ventas\backend\ControlVentasBackendApplication.class
+control\ventas\backend\entity\Producto.class
+control\ventas\backend\dto\VentaDTO.class
+control\ventas\backend\swagger\SwaggerConfig.class
+control\ventas\backend\service\VentaService.class
+control\ventas\backend\repository\VentaRepository.class

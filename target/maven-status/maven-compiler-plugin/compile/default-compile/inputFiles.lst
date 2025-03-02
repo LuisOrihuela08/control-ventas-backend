@@ -1,0 +1,12 @@
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\controller\ProductoController.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\controller\VentaController.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\ControlVentasBackendApplication.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\dto\ProductoDTO.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\dto\VentaDTO.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\entity\Producto.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\entity\Venta.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\repository\ProductoRepository.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\repository\VentaRepository.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\service\ProductoService.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\service\VentaService.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\swagger\SwaggerConfig.java
