@@ -52,7 +52,7 @@ public class VentaController {
 
 	private final Logger logger = LoggerFactory.getLogger(VentaController.class);
 
-	@GetMapping("/list")
+	@GetMapping("/list-all")
 	public ResponseEntity<?> getAllVentas() {
 
 		try {
