@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class ProductoDTO {
 
 	private String nombre_producto;
-    private int cantidad;
-    private double precio_unitario;
+	private int cantidad;
+	private double precio_unitario;
+	private double subtotal;
+	private String marca;
 }

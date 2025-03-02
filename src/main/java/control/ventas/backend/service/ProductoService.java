@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import control.ventas.backend.entity.Producto;
 import control.ventas.backend.repository.ProductoRepository;
@@ -16,6 +19,12 @@ public class ProductoService {
 	
 	public List<Producto> findAllProductos(){
 		return productoRepository.findAll();
+	}
+	
+	//Listar con productos con paginacion
+	public Page<Producto> findProductosByPagination (int page, int size){
+		Pageable pageable = PageRequest.of(page, size);
+		return productoRepository.findAll(pageable);
 	}
 	
 	public Producto saveProducto(Producto producto) {
