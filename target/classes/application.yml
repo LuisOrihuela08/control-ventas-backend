@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: control-ventas-backend
+  profiles:
+    active:
+    - prod  
+  
+      
+---
+# Configuración para el perfil 'default'
+spring:
+  config:
+    activate:
+      on-profile: default
+
+springdoc:     
+  swagger-ui:
+    path: /swagger-ui-custom.html
+
+---
+# Configuración para el perfil 'prod'
+spring:
+  config:
+    activate:
+      on-profile: prod
+    import: optional:file:.env[.properties]
+    
+  data:
+    mongodb:
+      uri: mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster1.6qhmb.mongodb.net/${MONGO_DATABASE}?retryWrites=true&w=majority&appName=Cluster1
+    
+    
+springdoc:     
+  swagger-ui:
+    path: /swagger-ui-custom.html
+
+---
+# Configuración para el perfil 'dev'
+spring:
+  config:
+    activate:
+      on-profile: dev
+    import: optional:file:.env[.properties]
+
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_DOCKER_USERNAME}:${MONGO_DOCKER_PASSWORD}@localhost:27017/${MONGO_DOCKER_DATABASE}?authSource=admin
+
+ 
+springdoc:    
+  swagger-ui:
+    path: /swagger-ui-custom.html
