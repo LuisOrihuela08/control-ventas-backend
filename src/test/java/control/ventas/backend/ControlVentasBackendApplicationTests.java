@@ -32,7 +32,8 @@ class ControlVentasBackendApplicationTests {
 	//@Test
 	//void contextLoads() {
 	//}
-
+	
+	//Esto es para configurar pruebas unitarias con JUnit y Mockito
 	@Test
 	public void testRegistrarVenta() {
 
