@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import control.ventas.backend.dto.ReporteVentasPorMetodoPagoDTO;
 import control.ventas.backend.entity.Venta;
 import control.ventas.backend.repository.VentaRepository;
 
@@ -48,5 +49,15 @@ public class VentaService {
 	public Page<Venta> listVentaByPages(int page, int size){
 		Pageable pageable = PageRequest.of(page, size);
 		return ventaRepository.findAll(pageable);
+	}
+	
+	//Método para buscar una venta por el nombre del producto
+	public List<Venta> findVentaByNombreProducto(String nombreProducto){
+		return ventaRepository.findByNombreProducto(nombreProducto);
+	}
+	
+	//Método para obtener el total de ventas por el metodo de pago
+	public List<ReporteVentasPorMetodoPagoDTO> findVentasByMetodoPago(){
+		return ventaRepository.obtenerTotalVentasPorMetodoPago();
 	}
 }
