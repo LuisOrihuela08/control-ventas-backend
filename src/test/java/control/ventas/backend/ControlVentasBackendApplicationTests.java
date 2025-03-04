@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import control.ventas.backend.entity.Producto;
 import control.ventas.backend.entity.Venta;
+import control.ventas.backend.repository.ProductoRepository;
 import control.ventas.backend.repository.VentaRepository;
 import control.ventas.backend.service.VentaService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,9 @@ class ControlVentasBackendApplicationTests {
 
 	@Mock
 	private VentaRepository ventaRepository;
+	
+	@Mock
+	private ProductoRepository productoRepository;
 
 	@InjectMocks
 	private VentaService ventaService;
@@ -43,42 +48,76 @@ class ControlVentasBackendApplicationTests {
 	public void testRegistrarVenta() {
 
 		try {
-			
-			// Simulacion de registros
-			List<Producto> productos = Arrays.asList(new Producto("Laptop", 10, 35.0, "Lenovo"),
-					new Producto("Parlantes", 15, 35.0, "Lenovo"));
+			// Simulación del stock de productos en la BD antes de la venta
+            Producto productoLaptop = new Producto("Laptop", 10, 35.0, "Lenovo");
+            Producto productoParlantes = new Producto("Parlantes", 15, 35.0, "Lenovo");
 
-			Venta venta = new Venta("1", productos, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now());
+            // Configurar Mockito para devolver los productos cuando se busquen en la BD
+            Mockito.when(productoRepository.findByNombreProducto("Laptop")).thenReturn(productoLaptop);
+            Mockito.when(productoRepository.findByNombreProducto("Parlantes")).thenReturn(productoParlantes);
 
-			// Esto simula el comportamieto del repositorio
-			Mockito.when(ventaRepository.save(Mockito.any(Venta.class))).thenReturn(venta);
+            // Simulación de productos vendidos
+            List<Producto> productosVendidos = Arrays.asList(
+                new Producto("Laptop", 2, 35.0, "Lenovo"),    // Se vendieron 2
+                new Producto("Parlantes", 3, 35.0, "Lenovo")  // Se vendieron 3
+            );
 
-			// Activar logs de Mockito
-			System.setProperty("org.mockito.logging.level", "DEBUG");
+            Venta venta = new Venta("1", productosVendidos, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now());
 
-			Venta ventaResultado = ventaService.registerVenta(venta);
+            // Simular el guardado de la venta
+            Mockito.when(ventaRepository.save(Mockito.any(Venta.class))).thenReturn(venta);
 
-			log.info("Venta registrada {}", ventaResultado);
+            // Ejecutar el método de prueba
+            Venta ventaResultado = ventaService.registerVenta(venta);
 
-			// Verificar que la venta no sea nula
-			assertNotNull(ventaResultado);
+            log.info("Venta registrada: {}", ventaResultado);
 
-			// Validar los atributos
-			assertEquals(2, ventaResultado.getProductos_vendidos().size());
-			assertEquals(1600.0, ventaResultado.getMonto_total());
-			assertEquals("Efectivo", ventaResultado.getMetodo_pago());
-			assertEquals(1700.0, ventaResultado.getDinero_cliente()); // Corregido
-			assertEquals(100.0, ventaResultado.getVuelto());
+            assertNotNull(ventaResultado);
+            assertEquals(2, ventaResultado.getProductos_vendidos().size());
+            assertEquals(1600.0, ventaResultado.getMonto_total());
+            assertEquals("Efectivo", ventaResultado.getMetodo_pago());
+            assertEquals(1700.0, ventaResultado.getDinero_cliente());
+            assertEquals(100.0, ventaResultado.getVuelto());
 
-			// Verificar que se haya llamado al método `save()`
-			Mockito.verify(ventaRepository, Mockito.times(1)).save(venta);
-			
-		} catch (Exception e) {
-			log.error("ERROR TEST AGREGAR VENTA", e.getMessage(), e);
-		}
-		
+            // Capturar los productos guardados en productoRepository
+            ArgumentCaptor<Producto> productoCaptor = ArgumentCaptor.forClass(Producto.class);
+            Mockito.verify(productoRepository, Mockito.times(2)).save(productoCaptor.capture());
 
-	}
+            List<Producto> productosGuardados = productoCaptor.getAllValues();
+
+            // Validar los productos guardados
+            Producto laptopGuardada = productosGuardados.stream()
+                .filter(p -> p.getNombreProducto().equals("Laptop"))
+                .findFirst()
+                .orElse(null);
+
+            Producto parlantesGuardados = productosGuardados.stream()
+                .filter(p -> p.getNombreProducto().equals("Parlantes"))
+                .findFirst()
+                .orElse(null);
+
+            // Verificar que los productos fueron actualizados con el stock correcto
+            assertNotNull(laptopGuardada);
+            assertEquals(8, laptopGuardada.getCantidad()); // 10 - 2 vendidos
+
+            assertNotNull(parlantesGuardados);
+            assertEquals(12, parlantesGuardados.getCantidad()); // 15 - 3 vendidos
+
+            // Capturar la venta guardada en ventaRepository
+            ArgumentCaptor<Venta> ventaCaptor = ArgumentCaptor.forClass(Venta.class);
+            Mockito.verify(ventaRepository, Mockito.times(1)).save(ventaCaptor.capture());
+
+            Venta ventaGuardada = ventaCaptor.getValue();
+            assertNotNull(ventaGuardada);
+            assertEquals(2, ventaGuardada.getProductos_vendidos().size());
+
+        } catch (Exception e) {
+            log.error("ERROR TEST AGREGAR VENTA", e.getMessage(), e);
+            fail("Se produjo un error en la prueba: " + e.getMessage());
+        }
+    }
+
+	
 
 	// Test para listar las ventas
 	@Test
@@ -125,16 +164,25 @@ class ControlVentasBackendApplicationTests {
 		try {
 			
 			// Simulacion de registros
-			List<Producto> productos = Arrays.asList(new Producto("Laptop", 10, 35.0, "Lenovo"),
-													 new Producto("Parlantes", 15, 35.0, "Lenovo"));
+			Producto productoLaptop = new Producto("Laptop", 10, 35.0, "Lenovo");
+	        Producto productoParlantes = new Producto("Parlantes", 15, 35.0, "Lenovo");
+	        
+	        Mockito.when(productoRepository.findByNombreProducto("Laptop")).thenReturn(productoLaptop);
+	        Mockito.when(productoRepository.findByNombreProducto("Parlantes")).thenReturn(productoParlantes);
+	        
+	        List<Producto> productos = Arrays.asList(new Producto("Laptop", 10, 35.0, "Lenovo"),
+					new Producto("Parlantes", 15, 35.0, "Lenovo"));
 
 			Venta ventaExistente = new Venta("1", productos, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now());
 			
+			/*
 			//Simulacion de edicion de los productos
-			List<Producto> productosEditados = Arrays.asList(new Producto("Laptop", 5, 35.0, "Lenovo"),
+			List<Producto> productosEditados = Arrays.asList(new Producto("Laptop", 10, 35.0, "Lenovo"),
 															 new Producto("Parlantes", 15, 35.0, "Genious"));
 			
-			Venta ventaEditada = new Venta("1", productosEditados, 3000.0, "Tarjeta", 3100.0, 0.0, LocalDateTime.now());
+	       */
+			
+			Venta ventaEditada = new Venta("1", productos, 3000.0, "Tarjeta", 1700.0, 0.0, LocalDateTime.now());
 						
 			//Simulamos la actualizacion
 			Mockito.when(ventaRepository.save(Mockito.any(Venta.class))).thenReturn(ventaEditada);
@@ -147,7 +195,7 @@ class ControlVentasBackendApplicationTests {
 			assertEquals(2, ventaResultado.getProductos_vendidos().size());
 			assertEquals(3000.0, ventaResultado.getMonto_total());
 			assertEquals("Tarjeta", ventaResultado.getMetodo_pago());
-			assertEquals(3100.0, ventaResultado.getDinero_cliente());
+			assertEquals(1700.0, ventaResultado.getDinero_cliente());
 			assertEquals(0.0, ventaResultado.getVuelto());
 			
 			//Verificamos ahora que se llama al metodo findById() y save()

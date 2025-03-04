@@ -2,6 +2,7 @@ package control.ventas.backend.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import control.ventas.backend.dto.ReporteVentasPorMetodoPagoDTO;
+import control.ventas.backend.entity.Producto;
 import control.ventas.backend.entity.Venta;
+import control.ventas.backend.repository.ProductoRepository;
 import control.ventas.backend.repository.VentaRepository;
 
 @Service
@@ -20,12 +23,43 @@ public class VentaService {
 	@Autowired
 	private VentaRepository ventaRepository;
 	
+	@Autowired
+	private ProductoRepository productoRepository;
+	
 	public List<Venta> findAllVentas(){
 		return ventaRepository.findAll();
 	}
 	
 	public Venta registerVenta(Venta venta) {
-		return ventaRepository.save(venta);
+		
+		try {
+			
+			//Antes de guardar una venta, voy a verificar si el producto tiene stock
+			for(Producto productoVendido: venta.getProductos_vendidos()) {
+				Producto productoBD = productoRepository.findByNombreProducto(productoVendido.getNombreProducto());
+				
+				if (productoBD == null) {
+					throw new IllegalArgumentException("El producto: " + productoVendido.getNombreProducto() + " no existe");
+				}
+				
+				if (productoBD.getCantidad() < productoVendido.getCantidad()) {
+					throw new IllegalArgumentException("Stock insuficiente para el producto " + productoVendido.getNombreProducto());
+				}
+			}
+			
+			//Y aca restamos el stock y actualizamos los productos
+			for(Producto productoVendido: venta.getProductos_vendidos()) {
+				Producto productoBD = productoRepository.findByNombreProducto(productoVendido.getNombreProducto());
+				productoBD.setCantidad(productoBD.getCantidad() - productoVendido.getCantidad());
+				productoRepository.save(productoBD);
+			}
+			
+			return ventaRepository.save(venta);
+			
+		} catch (Exception e) {
+			throw e;
+		}	
+		
 	}
 	
 	public Venta findVentaById(String id) {

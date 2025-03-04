@@ -63,7 +63,7 @@ public class ProductoController {
 		try {
 			
 			Producto producto = new Producto();
-			producto.setNombre_producto(productoDTO.getNombre_producto());
+			producto.setNombreProducto(productoDTO.getNombre_producto());
 			producto.setCantidad(productoDTO.getCantidad());
 			producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
 			producto.setMarca(productoDTO.getMarca());
