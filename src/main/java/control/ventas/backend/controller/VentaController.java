@@ -37,6 +37,7 @@ import com.lowagie.text.pdf.PdfPCell;
 import java.awt.Color;
 
 import control.ventas.backend.dto.ProductoDTO;
+import control.ventas.backend.dto.ReporteVentasPorMetodoPagoDTO;
 import control.ventas.backend.dto.VentaDTO;
 import control.ventas.backend.entity.Producto;
 import control.ventas.backend.entity.Venta;
@@ -101,6 +102,7 @@ public class VentaController {
 	            producto.setNombre_producto(productoDTO.getNombre_producto());
 	            producto.setCantidad(productoDTO.getCantidad());
 	            producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
+	            producto.setMarca(productoDTO.getMarca());
 
 	            // Calculamos subtotal por producto
 	            double subtotal = productoDTO.getCantidad() * productoDTO.getPrecio_unitario();
@@ -108,10 +110,11 @@ public class VentaController {
 	            montoTotal += subtotal;
 	            productosVendidos.add(producto);
 	        }
-
+	       
 	        ventaNueva.setProductos_vendidos(productosVendidos);
 	        ventaNueva.setMonto_total(montoTotal);
 	        ventaNueva.setVuelto(ventaNueva.getDinero_cliente() - montoTotal);
+	        
 
 	        ventaService.registerVenta(ventaNueva);
 	        logger.info("Venta creada {}", ventaNueva);
@@ -351,6 +354,40 @@ public class VentaController {
 		} catch (Exception e) {
 			logger.error("Error en el filtro buscar-por-fecha", e);
 			return new ResponseEntity<>(Map.of("error", "Error al filtrar las ventas por las fechas", "detalles", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	//Método para buscar venta por nombre del producto
+	@GetMapping("/buscar-venta/{nombreProducto}")
+	public ResponseEntity<?> getVentaByNombreProducto(@PathVariable("nombreProducto") String nombreProducto){
+		
+		try {
+			
+			List<Venta> ventaEncontrada = ventaService.findVentaByNombreProducto(nombreProducto);
+			
+			logger.info("Venta Encontrada OK");
+			return new ResponseEntity<>(ventaEncontrada, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			logger.error("ERROR AL ENCONTRAR LA VENTA", e);
+			return new ResponseEntity<>(Map.of("error", "Error al encontrar la venta por el nombre del producto", "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	//Método para reportar las ventas por el metodo de pago
+	@GetMapping("/buscar-venta/metodo-pago")
+	public ResponseEntity<?> getVentaReporteByMetodoPago(){
+		
+		try {
+			
+			List<ReporteVentasPorMetodoPagoDTO> reporte = ventaService.findVentasByMetodoPago();
+			
+			logger.info("Reporte de Ventas por Metodo de pago OK");
+			return new ResponseEntity<>(reporte, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			logger.error("ERROR al obtener el reporte: getVentaReporteByMetodoPago ", e);
+			return new ResponseEntity<>(Map.of("detalle", "Error al obtener el reporte de venta por metodo de pago", "error", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }
