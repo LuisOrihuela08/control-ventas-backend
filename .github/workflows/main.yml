@@ -33,3 +33,15 @@ jobs: #conjunto de tareas
       - name: Build JAR (sin omitir tests)
         run: ./mvnw clean package -DskipTests=false
 
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t luisorihuela92/control-ventas:latest . #de esta manera manejamos los tags y las versiones
+
+      - name: Push Docker image to Docker Hub
+        run: docker push luisorihuela92/control-ventas:latest
+
