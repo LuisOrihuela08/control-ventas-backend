@@ -31,6 +31,10 @@ public class VentaService {
 		return ventaRepository.findById(id).orElse(null);
 	}
 	
+	public void deleteVenta(String id) {
+		ventaRepository.deleteById(id);
+	}
+	
 	//Método para buscar ventas entre fechas
 	public List<Venta> findVentasBetweenFecha(String fechaInicioString, String fechaFinString){
 		LocalDateTime fechaInicio = LocalDate.parse(fechaInicioString).atStartOfDay();

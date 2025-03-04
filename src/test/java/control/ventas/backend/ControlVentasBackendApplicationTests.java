@@ -160,7 +160,7 @@ class ControlVentasBackendApplicationTests {
 	
 	//Test para encontrar una Venta por su ID
 	@Test
-	public void ventaFindById(){
+	public void testVentaFindById(){
 		
 		try {
 			
@@ -188,4 +188,31 @@ class ControlVentasBackendApplicationTests {
 			log.error("ERROR EN EL TEST VENTA FIND BY ID", e.getMessage(), e);
 		}
 	}
+	
+	//Test para eliminar una venta
+	@Test
+	public void testEliminarVenta() {
+		
+		try {
+			
+			List<Producto> productoTest = Arrays.asList(new Producto("Laptop", 5, 35.0, "Lenovo")) ;
+			
+			Venta ventaTest = new Venta("1", productoTest, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now());
+			
+			//Y aca hacemos la simulacion que lo eliminamos
+			Mockito.doNothing().when(ventaRepository).deleteById("1");
+			
+			ventaService.deleteVenta("1");
+			
+			log.info("VENTA ELIMINADA OK {}", ventaTest);
+			
+			// Verificando que el método deleteById fue llamado con el ID correcto
+	        Mockito.verify(ventaRepository, Mockito.times(1)).deleteById("1");
+			
+		} catch (Exception e) {
+			log.error("ERROR AL ELIMINA LA VENTA ", e.getMessage(), e);
+		}
+	}
+	
+	
 }
