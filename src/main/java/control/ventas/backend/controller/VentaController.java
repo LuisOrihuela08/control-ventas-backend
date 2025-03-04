@@ -99,7 +99,7 @@ public class VentaController {
 	        
 	        for (ProductoDTO productoDTO : ventaDTO.getProductos_vendidos()) {
 	            Producto producto = new Producto();
-	            producto.setNombre_producto(productoDTO.getNombre_producto());
+	            producto.setNombreProducto(productoDTO.getNombre_producto());
 	            producto.setCantidad(productoDTO.getCantidad());
 	            producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
 	            producto.setMarca(productoDTO.getMarca());
@@ -261,7 +261,7 @@ public class VentaController {
 	        table.addCell(header6);
 
 	        venta.getProductos_vendidos().forEach(producto -> {
-	            table.addCell(new PdfPCell(new Phrase(producto.getNombre_producto(), infoFont)));
+	            table.addCell(new PdfPCell(new Phrase(producto.getNombreProducto(), infoFont)));
 	            table.addCell(new PdfPCell(new Phrase(String.valueOf(producto.getCantidad()), infoFont)));
 	            table.addCell(new PdfPCell(new Phrase("S/." + producto.getPrecio_unitario(), infoFont)));
 	            table.addCell(new PdfPCell(new Phrase("S/." + (producto.getCantidad() * producto.getPrecio_unitario()), infoFont)));
