@@ -2,6 +2,7 @@ D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\j
 D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\controller\VentaController.java
 D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\ControlVentasBackendApplication.java
 D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\dto\ProductoDTO.java
+D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\dto\ReporteVentasPorMetodoPagoDTO.java
 D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\dto\VentaDTO.java
 D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\entity\Producto.java
 D:\SpringBoot Proyectos\control-ventas-backend\control-ventas-backend\src\main\java\control\ventas\backend\entity\Venta.java
