@@ -1,6 +1,7 @@
 control\ventas\backend\entity\Venta.class
 control\ventas\backend\service\ProductoService.class
 control\ventas\backend\dto\ProductoDTO.class
+control\ventas\backend\dto\ReporteVentasPorMetodoPagoDTO.class
 control\ventas\backend\controller\ProductoController.class
 control\ventas\backend\repository\ProductoRepository.class
 control\ventas\backend\controller\VentaController.class
