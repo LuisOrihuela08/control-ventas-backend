@@ -5,7 +5,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,6 +77,27 @@ public class ProductoController {
 		} catch (Exception e) {
 			log.error("registerProducto ERROR", e);
 			return new ResponseEntity<>(Map.of("error", "Hubo un error al registrar el producto", "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	//Método para generar el excel
+	@GetMapping("/inventario-excel")
+	public ResponseEntity<?> descargarInventarioExcel(){
+		
+		try {
+			
+			byte[] excelBytes = productoService.generarInventarioProductoExcel();
+			
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentDispositionFormData("attachment", "productos-inventario.xlsx");
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			
+			log.info("Excel generado OK");
+			return new ResponseEntity<>(excelBytes, headers, HttpStatus.CREATED);
+			
+		} catch (Exception e) {
+			log.error("Error al generar el excel", e);
+			return new ResponseEntity<>(Map.of("detalle", "No se genero el excel del inventario", "error", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

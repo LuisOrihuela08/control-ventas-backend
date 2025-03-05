@@ -1,8 +1,11 @@
 package control.ventas.backend.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,5 +40,53 @@ public class ProductoService {
 	
 	public void deleteProducto(String id) {
 		productoRepository.deleteById(id);
+	}
+	
+	//Método para generar un excel con los productos registrados
+	public byte[] generarInventarioProductoExcel() throws IOException {
+		List<Producto> productos = productoRepository.findAll();
+		
+		Workbook workbook = new XSSFWorkbook();
+		Sheet sheet = workbook.createSheet("Inventario de Productos");
+		
+		Row headerRow = sheet.createRow(0);
+		String[] columnas = {"ID", "Nombre", "Marca", "Cantidad", "Precio Unitario", "Subtotal"};
+		
+		for (int i = 0; i < columnas.length; i++) {
+			Cell cell = headerRow.createCell(i);
+			cell.setCellValue(columnas[i]);
+			cell.setCellStyle(crearEstiloEncabezado(workbook));
+		}
+		
+		//Llenamos el excel de inventario con los productos
+		int rowNum = 1;
+		for(Producto producto: productos) {
+			Row row = sheet.createRow(rowNum++);
+			row.createCell(0).setCellValue(producto.getId());
+			row.createCell(1).setCellValue(producto.getNombreProducto());
+			row.createCell(2).setCellValue(producto.getMarca());
+			row.createCell(3).setCellValue(producto.getPrecio_unitario());
+			row.createCell(4).setCellValue(producto.getSubtotal());
+			row.createCell(5).setCellValue(producto.getCantidad());
+		}
+		
+		//Esto es para ajustar el tamaño de las columnas
+		for (int i = 0; i < columnas.length; i++) {
+			sheet.autoSizeColumn(i);
+		}
+		
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		workbook.write(outputStream);
+		workbook.close();
+		
+		return outputStream.toByteArray();
+	}
+	
+	private CellStyle crearEstiloEncabezado(Workbook workbook) {
+		CellStyle estilo = workbook.createCellStyle();
+		Font font = workbook.createFont();
+		font.setBold(true);
+		estilo.setFont(font);
+		return estilo;
 	}
 }
