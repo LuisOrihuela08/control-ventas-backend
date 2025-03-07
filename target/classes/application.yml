@@ -28,7 +28,14 @@ spring:
   data:
     mongodb:
       uri: mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@cluster1.6qhmb.mongodb.net/${MONGO_DATABASE}?retryWrites=true&w=majority&appName=Cluster1
-    
+
+whatsapp:
+  api-url: "https://graph.facebook.com/v22.0/577972455399780/messages"
+  access-token: "${WHATSAPP_ACCESS_TOKEN}"
+  recipient-phone: "${WHATSAPP_RECIPIENT_PHONE}"
+
+server:
+  forward-headers-strategy: framework  # Habilita detección de protocolo HTTPS en producción    
     
 springdoc:     
   swagger-ui:
@@ -46,6 +53,8 @@ spring:
     mongodb:
       uri: mongodb://${MONGO_DOCKER_USERNAME}:${MONGO_DOCKER_PASSWORD}@localhost:27017/${MONGO_DOCKER_DATABASE}?authSource=admin
 
+server:
+  forward-headers-strategy: framework
  
 springdoc:    
   swagger-ui:
