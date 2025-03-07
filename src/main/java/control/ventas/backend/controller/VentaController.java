@@ -42,6 +42,7 @@ import control.ventas.backend.dto.VentaDTO;
 import control.ventas.backend.entity.Producto;
 import control.ventas.backend.entity.Venta;
 import control.ventas.backend.service.VentaService;
+import control.ventas.backend.service.WhatsAppService;
 
 @RestController
 @RequestMapping("/api-venta")
@@ -49,6 +50,14 @@ public class VentaController {
 
 	@Autowired
 	private VentaService ventaService;
+	
+	@Autowired
+	private WhatsAppService whatsAppService;
+	
+	public VentaController(VentaService ventaService, WhatsAppService whatsAppService) {
+        this.ventaService = ventaService;
+        this.whatsAppService = whatsAppService;
+    }
 
 	private final Logger logger = LoggerFactory.getLogger(VentaController.class);
 
@@ -83,6 +92,7 @@ public class VentaController {
 		}
 	}
 
+	
 	@PostMapping("/register")
 	public ResponseEntity<?> registerVenta(@RequestBody VentaDTO ventaDTO) {
 
@@ -97,6 +107,9 @@ public class VentaController {
 	        double montoTotal = 0;
 	        List<Producto> productosVendidos = new ArrayList<>();
 	        
+	        //Para listar los productos
+	        StringBuilder detalleProductos = new StringBuilder();
+	        
 	        for (ProductoDTO productoDTO : ventaDTO.getProductos_vendidos()) {
 	            Producto producto = new Producto();
 	            producto.setNombreProducto(productoDTO.getNombre_producto());
@@ -109,6 +122,14 @@ public class VentaController {
 	            producto.setSubtotal(subtotal);
 	            montoTotal += subtotal;
 	            productosVendidos.add(producto);
+	            
+	         
+	         // Agregar producto a la lista con formato limpio
+	            detalleProductos.append("📌 ")
+	                .append(producto.getNombreProducto())
+	                .append(" x").append(producto.getCantidad())
+	                .append(" - S/ ").append(String.format("%.2f", subtotal))
+	                .append("\n");
 	        }
 	       
 	        ventaNueva.setProductos_vendidos(productosVendidos);
@@ -117,6 +138,21 @@ public class VentaController {
 	        
 
 	        ventaService.registerVenta(ventaNueva);
+	        
+	     // Convertir LocalDateTime a String con formato "dd/MM/yyyy HH:mm"
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+	        String fechaFormateada = ventaNueva.getFechaCompra().format(formatter);
+	        
+	     // Enviar mensaje a WhatsApp con el template
+	        whatsAppService.sendWhatsAppMessage(
+	            String.format("S/ %.2f", montoTotal),
+	            ventaNueva.getMetodo_pago(),
+	            fechaFormateada,  // Ahora es un String
+	            detalleProductos.toString().trim()
+	        );
+	        
+	        
+	        
 	        logger.info("Venta creada {}", ventaNueva);
 	        return new ResponseEntity<>(ventaNueva, HttpStatus.CREATED);
 
@@ -125,6 +161,18 @@ public class VentaController {
 			return new ResponseEntity<>(Map.of("error", "Error al crear la venta", "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	
+	
+	@PostMapping("/enviar-mensaje")
+    public ResponseEntity<String> enviarMensaje(@RequestParam ("numeroTelefono") String numeroTelefono) {
+        String respuesta = whatsAppService.enviarMensajePrueba(numeroTelefono);
+        return ResponseEntity.ok(respuesta);
+    }
+	
+	
+	
+	
 	/*
 	//Crear un PDF en formato boleta
 	 @GetMapping("/export/pdf/{id}")
