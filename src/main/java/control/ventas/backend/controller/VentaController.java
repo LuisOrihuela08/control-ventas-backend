@@ -45,7 +45,7 @@ import control.ventas.backend.service.VentaService;
 import control.ventas.backend.service.WhatsAppService;
 
 @RestController
-@RequestMapping("/api-venta")
+@RequestMapping("/api/venta")
 public class VentaController {
 
 	@Autowired
@@ -77,7 +77,7 @@ public class VentaController {
 	}
 	
 	//Listar ventas con paginacion
-	@GetMapping("/list-venta-page")
+	@GetMapping("/list-page")
 	public ResponseEntity<?> getVentasByPage(@RequestParam("page") int page, @RequestParam ("size") int size){
 		
 		try {
@@ -112,7 +112,7 @@ public class VentaController {
 	        
 	        for (ProductoDTO productoDTO : ventaDTO.getProductos_vendidos()) {
 	            Producto producto = new Producto();
-	            producto.setNombreProducto(productoDTO.getNombre_producto());
+	            producto.setNombreProducto(productoDTO.getNombreProducto());
 	            producto.setCantidad(productoDTO.getCantidad());
 	            producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
 	            producto.setMarca(productoDTO.getMarca());
@@ -406,7 +406,7 @@ public class VentaController {
 	}
 	
 	//Método para buscar venta por nombre del producto
-	@GetMapping("/buscar-venta/{nombreProducto}")
+	@GetMapping("/buscar-nombre/{nombreProducto}")
 	public ResponseEntity<?> getVentaByNombreProducto(@PathVariable("nombreProducto") String nombreProducto){
 		
 		try {
@@ -423,7 +423,7 @@ public class VentaController {
 	}
 	
 	//Método para reportar las ventas por el metodo de pago
-	@GetMapping("/buscar-venta/metodo-pago")
+	@GetMapping("/total-ventas/metodo-pago")
 	public ResponseEntity<?> getVentaReporteByMetodoPago(){
 		
 		try {

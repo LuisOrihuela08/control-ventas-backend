@@ -79,7 +79,7 @@ public class VentaService {
         return ventaRepository.findVentaByFechaCompraBetween(fechaInicio, fechaFin);
 	}
 	
-	//Método para paginas las ventas
+	//Método para paginar las ventas
 	public Page<Venta> listVentaByPages(int page, int size){
 		Pageable pageable = PageRequest.of(page, size);
 		return ventaRepository.findAll(pageable);

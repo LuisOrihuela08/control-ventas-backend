@@ -3,7 +3,7 @@ spring:
     name: control-ventas-backend
   profiles:
     active:
-    - prod  
+    - dev  
   
       
 ---
@@ -53,6 +53,11 @@ spring:
     mongodb:
       uri: mongodb://${MONGO_DOCKER_USERNAME}:${MONGO_DOCKER_PASSWORD}@localhost:27017/${MONGO_DOCKER_DATABASE}?authSource=admin
 
+whatsapp:
+  api-url: "https://graph.facebook.com/v22.0/577972455399780/messages"
+  access-token: "${WHATSAPP_ACCESS_TOKEN}"
+  recipient-phone: "${WHATSAPP_RECIPIENT_PHONE}"
+  
 server:
   forward-headers-strategy: framework
  
