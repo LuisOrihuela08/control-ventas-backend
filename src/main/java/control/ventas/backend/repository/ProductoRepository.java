@@ -1,6 +1,7 @@
 package control.ventas.backend.repository;
 
-import java.util.List;
+
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,4 +22,12 @@ public interface ProductoRepository extends MongoRepository<Producto, String>{
 	
 	//Método para filtrar producto por marca
 	Page<Producto> findProductoByMarca (String marca, Pageable pageable);
+	
+	//Esto es para verificar si existe o no el producto por el nombre
+	//Lo utilizo para importar el excel
+	boolean existsByNombreProducto(String nombreProducto);
+	
+	//Esto es para importar, pero para verificar si el producto existe por nombre
+	//y actualizar los registros
+	Optional<Producto> getByNombreProducto (String nombreProducto);
 }
