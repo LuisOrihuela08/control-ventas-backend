@@ -2,6 +2,9 @@ package control.ventas.backend.service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import org.apache.poi.ss.usermodel.*;
@@ -11,6 +14,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import control.ventas.backend.entity.Producto;
 import control.ventas.backend.repository.ProductoRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -122,4 +127,86 @@ public class ProductoService {
 		estilo.setFont(font);
 		return estilo;
 	}
+	
+	//Método para importar excel
+	public List<Producto> importarExcelProductos(MultipartFile file) throws Exception {
+		
+		List<Producto> productos = new ArrayList<>();
+		
+		try (InputStream inputStream = file.getInputStream();
+			 Workbook workbook = new XSSFWorkbook(inputStream)) {
+			
+			Sheet sheet = workbook.getSheetAt(0);
+			
+			 // Empieza desde la fila 8 (índice 7)
+	        for (int i = 7; i <= sheet.getLastRowNum(); i++) {
+	            Row row = sheet.getRow(i);
+	            if (row == null) continue;
+				
+	            String nombreProducto = getCellValue(row.getCell(1)); // Columna B
+	            String marca = getCellValue(row.getCell(6));          // Columna G
+	            String precioUnitarioStr = getCellValue(row.getCell(9));      // Columna J
+	            String cantidadStr = getCellValue(row.getCell(11));    // Columna L
+			
+	            if (nombreProducto == null || nombreProducto.isEmpty()) continue;
+
+	            double precio = Double.parseDouble(precioUnitarioStr);
+	            int cantidad = (int) Double.parseDouble(cantidadStr);
+	            
+	            /*
+	             * Esto es solo para para verificar si existe el producto por el nombre
+             // Verificar si ya existe por nombre
+                if (!productoRepository.existsByNombreProducto(nombreProducto)) {
+                    Producto producto = new Producto();
+                    producto.setNombreProducto(nombreProducto);
+                    producto.setMarca(marca);
+                    producto.setPrecio_unitario(precio);
+                    producto.setCantidad(cantidad);
+
+                    productos.add(producto);
+                }
+                */
+	            
+	            //Esto no solo verifica si existe por nombre el producto
+	            //Sino que actualiza los registros como cantidad, marca, precio
+	            Optional<Producto> productoExistenteOpt = productoRepository.getByNombreProducto(nombreProducto);
+
+	            if (productoExistenteOpt.isPresent()) {
+	                Producto productoExistente = productoExistenteOpt.get();
+	                productoExistente.setCantidad(productoExistente.getCantidad() + cantidad);
+	                productoExistente.setPrecio_unitario(precio); // Puedes comentar esta línea si no quieres actualizar el precio
+	                productoExistente.setMarca(marca);             // Igual con la marca
+	                productos.add(productoExistente);
+	            } else {
+	                Producto nuevoProducto = new Producto();
+	                nuevoProducto.setNombreProducto(nombreProducto);
+	                nuevoProducto.setMarca(marca);
+	                nuevoProducto.setPrecio_unitario(precio);
+	                nuevoProducto.setCantidad(cantidad);
+	                productos.add(nuevoProducto);
+	            }
+			
+			}
+			return productoRepository.saveAll(productos);
+			
+		} catch (Exception e) {
+			 e.printStackTrace(); // o usa un logger si quieres
+		        throw e; // relanza para que el Controller lo capture
+		}
+	}
+	private String getCellValue(Cell cell) {
+	    if (cell == null) return "";
+	    switch (cell.getCellType()) {
+	        case STRING:
+	            return cell.getStringCellValue();
+	        case NUMERIC:
+	            return String.valueOf(cell.getNumericCellValue());
+	        case BOOLEAN:
+	            return String.valueOf(cell.getBooleanCellValue());
+	        default:
+	            return "";
+	    }
+	}
+
 }
+

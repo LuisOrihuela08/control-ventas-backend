@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.lowagie.text.Chunk;
 import com.lowagie.text.Document;
@@ -350,6 +351,33 @@ public class ProductoController {
 		} catch (Exception e) {
 			log.error("Error al crear el PDF del inventario de los producto: {}", e.getMessage(), e) ;
 			return ResponseEntity.internalServerError().build();
+		}
+	}
+	
+	//Método para importar excel
+	@PostMapping("/importar-excel")
+	public ResponseEntity<?> importExcelProductos(@RequestParam ("file") MultipartFile file){
+		
+		try {
+			
+			
+			if (file.isEmpty()) {
+				return new ResponseEntity<>(Map.of("mensaje", "Error, el archivo esta vacio"), HttpStatus.BAD_REQUEST);
+			}
+			
+			List<Producto> productosImportados = productoService.importarExcelProductos(file);
+			
+			if (productosImportados.isEmpty()) {
+				return new ResponseEntity<>(Map.of("mensaje", "No se importaron productos (posiblemente ya existian)"), HttpStatus.NOT_FOUND);
+			}
+			
+			log.info("Excel importado exitosamente");
+			return new ResponseEntity<>(productosImportados, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			log.error("Error al importar el excel de productos: {}", e);
+			return new ResponseEntity<>(Map.of("error", "Error al importar el excel de productos",
+												"detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }
