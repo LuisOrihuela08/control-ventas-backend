@@ -16,8 +16,10 @@ import control.ventas.backend.entity.Producto;
 import control.ventas.backend.entity.Venta;
 import control.ventas.backend.repository.ProductoRepository;
 import control.ventas.backend.repository.VentaRepository;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class VentaService {
 
 	@Autowired
@@ -71,12 +73,21 @@ public class VentaService {
 	}
 	
 	//Método para buscar ventas entre fechas
-	public List<Venta> findVentasBetweenFecha(String fechaInicioString, String fechaFinString){
-		LocalDateTime fechaInicio = LocalDate.parse(fechaInicioString).atStartOfDay();
-        LocalDateTime fechaFin = LocalDate.parse(fechaFinString).plusDays(1).atStartOfDay();
+	public Page<Venta> findVentasBetweenFecha(String fechaInicioString, String fechaFinString, int page, int size){
+		
+		try {
+			Pageable pageable = PageRequest.of(page, size);
+			LocalDateTime fechaInicio = LocalDate.parse(fechaInicioString).atStartOfDay();
+	        LocalDateTime fechaFin = LocalDate.parse(fechaFinString).plusDays(1).atStartOfDay();
 
-        // Realizar la consulta con el rango de fechas
-        return ventaRepository.findVentaByFechaCompraBetween(fechaInicio, fechaFin);
+	        // Realizar la consulta con el rango de fechas
+	        return ventaRepository.findVentaByFechaCompraBetween(fechaInicio, fechaFin, pageable);
+	        
+		} catch (Exception e) {
+			log.error("Error al buscar ventas por fechas: {}", e, e.getMessage());
+			throw new RuntimeException("Error, al buscar ventas por fechas: " + e.getMessage());
+		}
+		
 	}
 	
 	//Método para paginar las ventas
@@ -86,9 +97,16 @@ public class VentaService {
 	}
 	
 	//Método para buscar una venta por el nombre del producto
-	public List<Venta> findVentaByNombreProducto(String nombreProducto){
-		return ventaRepository.findByNombreProducto(nombreProducto);
+	public Page<Venta> findVentaByNombreProducto(String nombreProducto, int page, int size){
+		try {
+			Pageable pageable = PageRequest.of(page, size);
+			return ventaRepository.findByNombreProducto(nombreProducto, pageable);
+		} catch (Exception e) {
+			log.error("Error al buscar ventas por nombre del producto: {}", e, e.getMessage());
+			throw new RuntimeException("Error, al buscar por ventas por el nombre del producto: " + e.getMessage());
+		}	
 	}
+	
 	
 	//Método para obtener el total de ventas por el metodo de pago
 	public List<ReporteVentasPorMetodoPagoDTO> findVentasByMetodoPago(){

@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @Slf4j
 @RequestMapping("/api/producto")
+@CrossOrigin(origins = "http://localhost:4200/", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,RequestMethod.DELETE, RequestMethod.OPTIONS })//Esta URL es para pruebas de manera local
 public class ProductoController {
 
 	@Autowired
@@ -104,6 +107,36 @@ public class ProductoController {
 			log.info("Filtro por nombre del producto");
 			log.info("Búsqueda exitosa con el nombre: {}", nombreProducto);
 			return new ResponseEntity<>(productoPage, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			log.error("Hubo un error al buscar producto con el nombre: {}", nombreProducto);
+			return new ResponseEntity<>(Map.of("error", "Error, al buscar el producto con el nombre: "+ nombreProducto,
+											   "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+	}
+	
+	//Método para buscar producto por nombre, y es consumido desde el componente de agregar venta desde el Frontend
+	@GetMapping("/find/nombreProducto/venta/{nombreProducto}")
+	public ResponseEntity<?> getProductoByNombreForVenta(@PathVariable ("nombreProducto") String nombreProducto){
+		
+		try {
+			
+			if (nombreProducto.isBlank()) {
+				log.error("Error, el nombre no puede estar vacío para la búsqueda");
+				return new ResponseEntity<>(Map.of("mensaje", "Error, el nombre no puede estar vacío o en blanco"), HttpStatus.BAD_REQUEST);
+			}
+			
+			List<Producto> listProductos = productoService.findByNombreProductoForVenta(nombreProducto);
+			
+			if (listProductos.isEmpty()) {
+				log.error("No existe producto con el nombre: {}", nombreProducto);
+				return new ResponseEntity<>(Map.of("mensaje", "No existe producto con el nombre: " + nombreProducto), HttpStatus.NOT_FOUND);
+			}
+			
+			log.info("Búsqueda exitosa con el nombre: {}", nombreProducto);
+			log.info("Producto(s) encontrado(s): {}", listProductos);
+			return new ResponseEntity<>(listProductos, HttpStatus.OK);
 			
 		} catch (Exception e) {
 			log.error("Hubo un error al buscar producto con el nombre: {}", nombreProducto);
