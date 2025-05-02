@@ -2,6 +2,8 @@ package control.ventas.backend.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,11 +18,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,6 +50,7 @@ import control.ventas.backend.service.WhatsAppService;
 
 @RestController
 @RequestMapping("/api/venta")
+@CrossOrigin(origins = "http://localhost:4200/", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,RequestMethod.DELETE, RequestMethod.OPTIONS })//Esta URL es para pruebas de manera local
 public class VentaController {
 
 	@Autowired
@@ -134,7 +139,13 @@ public class VentaController {
 	       
 	        ventaNueva.setProductos_vendidos(productosVendidos);
 	        ventaNueva.setMonto_total(montoTotal);
-	        ventaNueva.setVuelto(ventaNueva.getDinero_cliente() - montoTotal);
+	        //ventaNueva.setVuelto(ventaNueva.getDinero_cliente() - montoTotal);
+	        //Esto es para redondear el vuelto a solo decimales
+	        ventaNueva.setVuelto(
+	        	    BigDecimal.valueOf(ventaNueva.getDinero_cliente() - montoTotal)
+	        	              .setScale(2, RoundingMode.HALF_UP)
+	        	              .doubleValue()
+	        	);
 	        
 
 	        ventaService.registerVenta(ventaNueva);
@@ -240,7 +251,8 @@ public class VentaController {
 	*/
 	@GetMapping("/export/pdf/{id}")
 	public ResponseEntity<InputStreamResource> exportVentaToPDF(@PathVariable("id") String id) {
-	    try {
+	    
+		try {
 	        Venta venta = ventaService.findVentaById(id);
 
 	        if (venta == null) {
@@ -331,7 +343,8 @@ public class VentaController {
 	        metodoPago.setAlignment(Element.ALIGN_RIGHT);
 	        document.add(metodoPago);
 	        
-	        Paragraph vuelto = new Paragraph("Vuelto: S/." + venta.getVuelto(), montosFont);
+	        Paragraph vuelto = new Paragraph("Vuelto: S/." + String.format("%.2f", venta.getVuelto()), montosFont);//Toma solo decimales
+	        //Paragraph vuelto = new Paragraph("Vuelto: S/." + venta.getVuelto(), montosFont);
 	        vuelto.setAlignment(Element.ALIGN_RIGHT);
 	        document.add(vuelto);
 
@@ -347,6 +360,7 @@ public class VentaController {
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.add("Content-Disposition", "attachment; filename=boleta-compra.pdf");
 
+	        logger.info("PDF generado de la venta seleccionada con éxito!");
 	        return ResponseEntity.ok()
 	                .headers(headers)
 	                .contentType(MediaType.APPLICATION_PDF)
@@ -382,7 +396,10 @@ public class VentaController {
 	
 	//Método para buscar ventas entre fechas
 	@GetMapping("/buscar-por-fecha")
-	public ResponseEntity<?> getVentasBetweenFecha(@RequestParam("fechaInicio") String  fechaInicio, @RequestParam ("fechaFin") String  fechaFin){
+	public ResponseEntity<?> getVentasBetweenFecha(@RequestParam("fechaInicio") String  fechaInicio, 
+												   @RequestParam ("fechaFin") String  fechaFin,
+												   @RequestParam ("page") int page,
+												   @RequestParam ("size") int size){
 		
 		try {
 			
@@ -390,13 +407,14 @@ public class VentaController {
 				return new ResponseEntity<>(Map.of("error", "Por favor ingrese ambas fechas"), HttpStatus.BAD_REQUEST);
 			}
 			
-			List<Venta> ventas = ventaService.findVentasBetweenFecha(fechaInicio, fechaFin);
+			Page<Venta> ventas = ventaService.findVentasBetweenFecha(fechaInicio, fechaFin, page, size);
 			
 			if (ventas.isEmpty()) {
+				logger.error("No se encontro ventas en las fecha inicio: {}, fecha fin: {}",fechaInicio, fechaFin);
 	            return new ResponseEntity<>(Map.of("mensaje", "No se encontraron ventas en el rango de fechas"), HttpStatus.NOT_FOUND);
 	        }
 			
-			logger.info("Busqueda exitosa");
+			logger.info("Búsqueda exitosa con las fechas ingresadas, FI: {}, FF: {}", fechaInicio, fechaFin);
 			return ResponseEntity.ok(ventas);
 		
 		} catch (Exception e) {
@@ -407,18 +425,30 @@ public class VentaController {
 	
 	//Método para buscar venta por nombre del producto
 	@GetMapping("/buscar-nombre/{nombreProducto}")
-	public ResponseEntity<?> getVentaByNombreProducto(@PathVariable("nombreProducto") String nombreProducto){
+	public ResponseEntity<?> getVentaByNombreProducto(@PathVariable("nombreProducto") String nombreProducto,
+													  @RequestParam ("page") int page,
+													  @RequestParam ("size") int size){
 		
 		try {
+			if (nombreProducto.isBlank()) {
+				logger.error("Error, el nombre no puede estar vacío para la búsqueda");
+				return new ResponseEntity<>(Map.of("mensaje", "Error, el nombre no puede estar vacío o en blanco"), HttpStatus.BAD_REQUEST);
+			}
 			
-			List<Venta> ventaEncontrada = ventaService.findVentaByNombreProducto(nombreProducto);
+			Page<Venta> ventaEncontrada = ventaService.findVentaByNombreProducto(nombreProducto, page, size);
+			
+			if (ventaEncontrada.isEmpty()) {
+				logger.error("No hay ventas con el producto: {}", nombreProducto);
+				return new ResponseEntity<>(Map.of("mensaje", "No existe ventas con el producto: " + nombreProducto), HttpStatus.NOT_FOUND);
+			}
 			
 			logger.info("Venta Encontrada OK");
+			logger.info("Búsqueda existosa con el nombre del producto: {}", nombreProducto);
 			return new ResponseEntity<>(ventaEncontrada, HttpStatus.OK);
 			
 		} catch (Exception e) {
 			logger.error("ERROR AL ENCONTRAR LA VENTA", e);
-			return new ResponseEntity<>(Map.of("error", "Error al encontrar la venta por el nombre del producto", "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(Map.of("error", "Error al encontrar la venta por el nombre del producto: {}" + nombreProducto, "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	

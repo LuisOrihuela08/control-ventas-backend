@@ -60,6 +60,17 @@ public class ProductoService {
 		
 		
 	}
+	//Este método lo implemente para buscar productos por el nombre y poder registrar una venta con productos
+		//que existen
+		public List<Producto> findByNombreProductoForVenta(String nombreProducto){
+			
+			try {
+				return productoRepository.findVentaByNombreProducto(nombreProducto);
+			} catch (Exception e) {
+				log.error("Error al buscar producto por nombre: {}", e, e.getMessage());
+				throw new RuntimeException("Error, al buscar por nombre: " + e.getMessage());
+			}
+		}
 	
 	//Método para buscar producto por marca
 	public Page<Producto> findProductoByMarca (String marca, int page, int size){

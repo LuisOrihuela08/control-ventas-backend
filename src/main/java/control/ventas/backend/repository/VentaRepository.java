@@ -15,14 +15,14 @@ import control.ventas.backend.entity.Venta;
 public interface VentaRepository extends MongoRepository<Venta, String>{
 
 	//Método para filtro ventas por fecha
-	List<Venta> findVentaByFechaCompraBetween(LocalDateTime fechaInicio, LocalDateTime fechaFin);
+	Page<Venta> findVentaByFechaCompraBetween(LocalDateTime fechaInicio, LocalDateTime fechaFin, Pageable pageable);
 
 	//Paginar las ventas
 	Page<Venta> findAll(Pageable pageable);
 	
 	//Método para encontrar una venta por el nombre del producto
 	@Query("{ 'productos_vendidos.nombre_producto': ?0 }")
-	List<Venta> findByNombreProducto(String nombreProducto);
+	Page<Venta> findByNombreProducto(String nombreProducto, Pageable pageable);
 	
 	//Método para calcular las ventas segun el metodo de pago
 	@Aggregation(pipeline = {
