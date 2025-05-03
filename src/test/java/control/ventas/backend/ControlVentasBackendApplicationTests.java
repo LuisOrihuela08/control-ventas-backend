@@ -75,7 +75,7 @@ class ControlVentasBackendApplicationTests {
             assertNotNull(ventaResultado);
             assertEquals(2, ventaResultado.getProductos_vendidos().size());
             assertEquals(1600.0, ventaResultado.getMonto_total());
-            assertEquals("Efectivo", ventaResultado.getMetodo_pago());
+            assertEquals("Efectivo", ventaResultado.getMetodoPago());
             assertEquals(1700.0, ventaResultado.getDinero_cliente());
             assertEquals(100.0, ventaResultado.getVuelto());
 
@@ -144,8 +144,8 @@ class ControlVentasBackendApplicationTests {
 			// Validaciones
 			assertNotNull(resultadoTestList);
 			assertEquals(2, resultadoTestList.size());
-			assertEquals("Efectivo", resultadoTestList.get(0).getMetodo_pago());
-			assertEquals("Tarjeta", resultadoTestList.get(1).getMetodo_pago());
+			assertEquals("Efectivo", resultadoTestList.get(0).getMetodoPago());
+			assertEquals("Tarjeta", resultadoTestList.get(1).getMetodoPago());
 
 			// Verificar que se llamó a findAll() exactamente una vez
 			Mockito.verify(ventaRepository, Mockito.times(1)).findAll();
@@ -194,7 +194,7 @@ class ControlVentasBackendApplicationTests {
 			assertNotNull(ventaResultado);
 			assertEquals(2, ventaResultado.getProductos_vendidos().size());
 			assertEquals(3000.0, ventaResultado.getMonto_total());
-			assertEquals("Tarjeta", ventaResultado.getMetodo_pago());
+			assertEquals("Tarjeta", ventaResultado.getMetodoPago());
 			assertEquals(1700.0, ventaResultado.getDinero_cliente());
 			assertEquals(0.0, ventaResultado.getVuelto());
 			
@@ -226,7 +226,7 @@ class ControlVentasBackendApplicationTests {
 			assertNotNull(ventaEncontrada);
 			assertEquals(2, ventaEncontrada.getProductos_vendidos().size());
 			assertEquals(1600.0, ventaEncontrada.getMonto_total());
-			assertEquals("Efectivo", ventaEncontrada.getMetodo_pago());
+			assertEquals("Efectivo", ventaEncontrada.getMetodoPago());
 			assertEquals(1700.0, ventaEncontrada.getDinero_cliente());
 			assertEquals(100.0, ventaEncontrada.getVuelto());
 			
