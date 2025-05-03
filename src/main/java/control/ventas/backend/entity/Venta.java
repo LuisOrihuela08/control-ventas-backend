@@ -23,7 +23,8 @@ public class Venta {
 	private String id;
 	private List<Producto> productos_vendidos;
 	private double monto_total;
-	private String metodo_pago;
+	@Field("metodo_pago")
+	private String metodoPago;
 	private double dinero_cliente;
 	private double vuelto;
 	@Field("fecha_compra")

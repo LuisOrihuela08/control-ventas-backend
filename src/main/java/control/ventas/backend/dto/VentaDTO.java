@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class VentaDTO {
     private List<ProductoDTO> productos_vendidos;
     private double monto_total;
-    private String metodo_pago;
+    private String metodoPago;
     private double dinero_cliente;
     private LocalDateTime fecha_compra;
 }

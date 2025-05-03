@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,9 +105,10 @@ public class VentaController {
 		try {
 			
 			Venta ventaNueva = new Venta();
-	        ventaNueva.setMetodo_pago(ventaDTO.getMetodo_pago());
+	        ventaNueva.setMetodoPago(ventaDTO.getMetodoPago());
 	        ventaNueva.setDinero_cliente(ventaDTO.getDinero_cliente());
-	        ventaNueva.setFechaCompra(ventaDTO.getFecha_compra());
+	        ventaNueva.setFechaCompra(LocalDateTime.now());//Para capturar la fecha en tiempo real
+	        //ventaNueva.setFechaCompra(ventaDTO.getFecha_compra());
 
 	        // Cálculos de subtotal y total
 	        double montoTotal = 0;
@@ -157,7 +159,7 @@ public class VentaController {
 	     // Enviar mensaje a WhatsApp con el template
 	        whatsAppService.sendWhatsAppMessage(
 	            String.format("S/ %.2f", montoTotal),
-	            ventaNueva.getMetodo_pago(),
+	            ventaNueva.getMetodoPago(),
 	            fechaFormateada,  // Ahora es un String
 	            detalleProductos.toString().trim()
 	        );
@@ -339,7 +341,7 @@ public class VentaController {
 	        dineroCliente.setAlignment(Element.ALIGN_RIGHT);
 	        document.add(dineroCliente);
 	        
-	        Paragraph metodoPago = new Paragraph("Método de pago: " + venta.getMetodo_pago(), montosFont);
+	        Paragraph metodoPago = new Paragraph("Método de pago: " + venta.getMetodoPago(), montosFont);
 	        metodoPago.setAlignment(Element.ALIGN_RIGHT);
 	        document.add(metodoPago);
 	        
@@ -450,6 +452,36 @@ public class VentaController {
 			logger.error("ERROR AL ENCONTRAR LA VENTA", e);
 			return new ResponseEntity<>(Map.of("error", "Error al encontrar la venta por el nombre del producto: {}" + nombreProducto, "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+	
+	//Método para filtrar ventas por metodo de pago
+	@GetMapping("/buscar-metodoPago/{metodoPago}")
+	public ResponseEntity<?> getVentasByMetodoPago(@PathVariable("metodoPago") String metodoPago,
+												   @RequestParam ("page") int page,
+												   @RequestParam ("size") int size){
+		
+		try {
+			
+			if (metodoPago.isBlank()) {
+				logger.error("Error, el método de pago no puede estar vacío para la búsqueda");
+				return new ResponseEntity<>(Map.of("mensaje", "Error, el método de pago no puede estar vacío o en blanco"), HttpStatus.BAD_REQUEST);
+			}
+			
+			Page<Venta> ventaPage = ventaService.findVentaByMetodoPago(metodoPago, page, size);
+			
+			if (ventaPage.isEmpty()) {
+				logger.error("No hay ventas con el método de pago: {}", metodoPago);
+				return new ResponseEntity<>(Map.of("mensaje", "No existe ventas con el método de pago: " + metodoPago), HttpStatus.NOT_FOUND);
+			}
+			
+			logger.info("Búsqueda existosa con el método de pago: {}", metodoPago);
+			return new ResponseEntity<>(ventaPage, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			logger.error("ERROR AL ENCONTRAR LA VENTA", e);
+			return new ResponseEntity<>(Map.of("error", "Error al encontrar la venta por el método de pago: {}" + metodoPago, "detalle", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
 	}
 	
 	//Método para reportar las ventas por el metodo de pago

@@ -2,7 +2,6 @@ package control.ventas.backend.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,5 +110,19 @@ public class VentaService {
 	//Método para obtener el total de ventas por el metodo de pago
 	public List<ReporteVentasPorMetodoPagoDTO> findVentasByMetodoPago(){
 		return ventaRepository.obtenerTotalVentasPorMetodoPago();
+	}
+	
+	//Método para filtrar ventas por metodo de pago
+	public Page<Venta> findVentaByMetodoPago(String metodoPago, int page, int size){
+		
+		try {
+			
+			Pageable pageable = PageRequest.of(page, size);
+			return ventaRepository.findVentaByMetodoPago(metodoPago, pageable);
+			
+		} catch (Exception e) {
+			log.error("Error al buscar ventas por método de pago: {}", e, e.getMessage());
+			throw new RuntimeException("Error, al buscar por ventas por método de pago: " + e.getMessage());
+		}
 	}
 }

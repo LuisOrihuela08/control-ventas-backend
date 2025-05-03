@@ -20,6 +20,9 @@ public interface VentaRepository extends MongoRepository<Venta, String>{
 	//Paginar las ventas
 	Page<Venta> findAll(Pageable pageable);
 	
+	//Método para buscar ventas por metodo de pago
+	Page<Venta> findVentaByMetodoPago(String metodoPago, Pageable pageable);
+	
 	//Método para encontrar una venta por el nombre del producto
 	@Query("{ 'productos_vendidos.nombre_producto': ?0 }")
 	Page<Venta> findByNombreProducto(String nombreProducto, Pageable pageable);
