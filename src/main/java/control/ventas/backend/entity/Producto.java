@@ -19,6 +19,7 @@ public class Producto {
 	private String id;
 	@Field(name = "nombre_producto")
 	private String nombreProducto;
+	private String codigo;
 	private int cantidad;
 	private double precio_unitario;
 	private double subtotal;
@@ -26,9 +27,10 @@ public class Producto {
 	
 	
 	//Este constructor es para el Test Unitario
-	public Producto(String nombreProducto, int cantidad, double precio_unitario, String marca) {
+	public Producto(String nombreProducto, String codigo, int cantidad, double precio_unitario, String marca) {
 		super();
 		this.nombreProducto = nombreProducto;
+		this.codigo = codigo;
 		this.cantidad = cantidad;
 		this.precio_unitario = precio_unitario;
 		this.marca = marca;

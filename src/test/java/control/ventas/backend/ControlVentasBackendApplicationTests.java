@@ -49,8 +49,8 @@ class ControlVentasBackendApplicationTests {
 
 		try {
 			// Simulación del stock de productos en la BD antes de la venta
-            Producto productoLaptop = new Producto("Laptop", 10, 35.0, "Lenovo");
-            Producto productoParlantes = new Producto("Parlantes", 15, 35.0, "Lenovo");
+            Producto productoLaptop = new Producto("Laptop", "SDC45", 10, 35.0, "Lenovo");
+            Producto productoParlantes = new Producto("Parlantes","SDC45", 15, 35.0, "Lenovo");
 
             // Configurar Mockito para devolver los productos cuando se busquen en la BD
             Mockito.when(productoRepository.findByNombreProducto("Laptop")).thenReturn(productoLaptop);
@@ -58,8 +58,8 @@ class ControlVentasBackendApplicationTests {
 
             // Simulación de productos vendidos
             List<Producto> productosVendidos = Arrays.asList(
-                new Producto("Laptop", 2, 35.0, "Lenovo"),    // Se vendieron 2
-                new Producto("Parlantes", 3, 35.0, "Lenovo")  // Se vendieron 3
+                new Producto("Laptop", "SDC45", 2, 35.0, "Lenovo"),    // Se vendieron 2
+                new Producto("Parlantes", "SDC45", 3, 35.0, "Lenovo")  // Se vendieron 3
             );
 
             Venta venta = new Venta("1", productosVendidos, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now());
@@ -125,8 +125,8 @@ class ControlVentasBackendApplicationTests {
 		
 		try {
 			
-			List<Producto> producto1 = Arrays.asList(new Producto("Laptop", 10, 35.0, "Lenovo"));
-			List<Producto> producto2 = Arrays.asList(new Producto("Parlantes", 15, 35.0, "Lenovo"));
+			List<Producto> producto1 = Arrays.asList(new Producto("Laptop", "SDC45", 10, 35.0, "Lenovo"));
+			List<Producto> producto2 = Arrays.asList(new Producto("Parlantes", "SDC45", 15, 35.0, "Lenovo"));
 
 			Venta venta1 = new Venta("1", producto1, 3000.0, "Efectivo", 3100.0, 100.0, LocalDateTime.now());
 			Venta venta2 = new Venta("2", producto2, 250.0, "Tarjeta", 250.0, 0.0, LocalDateTime.now());
@@ -164,14 +164,14 @@ class ControlVentasBackendApplicationTests {
 		try {
 			
 			// Simulacion de registros
-			Producto productoLaptop = new Producto("Laptop", 10, 35.0, "Lenovo");
-	        Producto productoParlantes = new Producto("Parlantes", 15, 35.0, "Lenovo");
+			Producto productoLaptop = new Producto("Laptop", "SDC45", 10, 35.0, "Lenovo");
+	        Producto productoParlantes = new Producto("Parlantes", "SDC45", 15, 35.0, "Lenovo");
 	        
 	        Mockito.when(productoRepository.findByNombreProducto("Laptop")).thenReturn(productoLaptop);
 	        Mockito.when(productoRepository.findByNombreProducto("Parlantes")).thenReturn(productoParlantes);
 	        
-	        List<Producto> productos = Arrays.asList(new Producto("Laptop", 10, 35.0, "Lenovo"),
-					new Producto("Parlantes", 15, 35.0, "Lenovo"));
+	        List<Producto> productos = Arrays.asList(new Producto("Laptop","SDC45", 10, 35.0, "Lenovo"),
+					new Producto("Parlantes", "SDC45", 15, 35.0, "Lenovo"));
 
 			Venta ventaExistente = new Venta("1", productos, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now());
 			
@@ -212,8 +212,8 @@ class ControlVentasBackendApplicationTests {
 		
 		try {
 			
-			List<Producto> productos = Arrays.asList(new Producto("Laptop", 5, 35.0, "Lenovo"),
-													 new Producto("Parlantes", 15, 35.0, "Genious"));
+			List<Producto> productos = Arrays.asList(new Producto("Laptop", "SDC45", 5, 35.0, "Lenovo"),
+													 new Producto("Parlantes", "SDC45", 15, 35.0, "Genious"));
 			
 			Optional<Venta> venta = Optional.ofNullable(new Venta("1", productos, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now()));
 			
@@ -243,7 +243,7 @@ class ControlVentasBackendApplicationTests {
 		
 		try {
 			
-			List<Producto> productoTest = Arrays.asList(new Producto("Laptop", 5, 35.0, "Lenovo")) ;
+			List<Producto> productoTest = Arrays.asList(new Producto("Laptop","SDC45", 5, 35.0, "Lenovo")) ;
 			
 			Venta ventaTest = new Venta("1", productoTest, 1600.0, "Efectivo", 1700.0, 100.0, LocalDateTime.now());
 			
