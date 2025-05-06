@@ -185,6 +185,7 @@ public class ProductoController {
 			
 			Producto producto = new Producto();
 			producto.setNombreProducto(productoDTO.getNombreProducto());
+			producto.setCodigo(productoDTO.getCodigo());
 			producto.setCantidad(productoDTO.getCantidad());
 			producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
 			producto.setMarca(productoDTO.getMarca());
@@ -214,6 +215,7 @@ public class ProductoController {
 			
 			Producto producto = productoOptional.get();
 			producto.setNombreProducto(productoDTO.getNombreProducto());
+			producto.setCodigo(productoDTO.getCodigo());
 			producto.setMarca(productoDTO.getMarca());
 			producto.setCantidad(productoDTO.getCantidad());
 			producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
@@ -324,45 +326,54 @@ public class ProductoController {
 	        table.setWidthPercentage(100);
 	        table.setWidths(new float[]{40, 20, 20, 20});
 
-	        PdfPCell header3 = new PdfPCell(new Phrase("Nombre de Producto", headerFont));
+	        PdfPCell header3 = new PdfPCell(new Phrase("Código", headerFont));
 	        header3.setBackgroundColor(new Color(63, 169, 219));
 	        header3.setHorizontalAlignment(Element.ALIGN_CENTER);
 	        table.addCell(header3);
-
-	        PdfPCell header4 = new PdfPCell(new Phrase("Marca", headerFont));
+	        
+	        PdfPCell header4 = new PdfPCell(new Phrase("Nombre de Producto", headerFont));
 	        header4.setBackgroundColor(new Color(63, 169, 219));
 	        header4.setHorizontalAlignment(Element.ALIGN_CENTER);
 	        table.addCell(header4);
-	        
-	        PdfPCell header5 = new PdfPCell(new Phrase("Cantidad", headerFont));
+
+	        PdfPCell header5 = new PdfPCell(new Phrase("Marca", headerFont));
 	        header5.setBackgroundColor(new Color(63, 169, 219));
 	        header5.setHorizontalAlignment(Element.ALIGN_CENTER);
 	        table.addCell(header5);
-
-	        PdfPCell header6 = new PdfPCell(new Phrase("Precio Unitario", headerFont));
+	        
+	        PdfPCell header6 = new PdfPCell(new Phrase("Cantidad", headerFont));
 	        header6.setBackgroundColor(new Color(63, 169, 219));
 	        header6.setHorizontalAlignment(Element.ALIGN_CENTER);
 	        table.addCell(header6);
+
+	        PdfPCell header7 = new PdfPCell(new Phrase("Precio Unitario", headerFont));
+	        header7.setBackgroundColor(new Color(63, 169, 219));
+	        header7.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        table.addCell(header7);
 
 	        
 	        
 	     // Agregar los productos a la tabla
 	        for (Producto producto : listProducto) {
-	            PdfPCell cell1 = new PdfPCell(new Phrase(producto.getNombreProducto(), montosFont));
+	        	PdfPCell cell1 = new PdfPCell(new Phrase(producto.getCodigo(), montosFont));
 	            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
 	            table.addCell(cell1);
-
-	            PdfPCell cell2 = new PdfPCell(new Phrase(producto.getMarca(), montosFont));
+	            
+	            PdfPCell cell2 = new PdfPCell(new Phrase(producto.getNombreProducto(), montosFont));
 	            cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
 	            table.addCell(cell2);
-	            
-	            PdfPCell cell3 = new PdfPCell(new Phrase(String.valueOf(producto.getCantidad()), montosFont));
+
+	            PdfPCell cell3 = new PdfPCell(new Phrase(producto.getMarca(), montosFont));
 	            cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
 	            table.addCell(cell3);
-
-	            PdfPCell cell4 = new PdfPCell(new Phrase(String.format("%.2f", producto.getPrecio_unitario()), montosFont));
+	            
+	            PdfPCell cell4 = new PdfPCell(new Phrase(String.valueOf(producto.getCantidad()), montosFont));
 	            cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
 	            table.addCell(cell4);
+
+	            PdfPCell cell5 = new PdfPCell(new Phrase(String.format("%.2f", producto.getPrecio_unitario()), montosFont));
+	            cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
+	            table.addCell(cell5);
 
 	            
 	        }
@@ -376,6 +387,7 @@ public class ProductoController {
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.add("Content-Disposition", "attachment; filename=producto-inventario.pdf");
 
+	        log.info("Reporte de Inventario de Productos PDF OK! ");
 	        return ResponseEntity.ok()
 	                .headers(headers)
 	                .contentType(MediaType.APPLICATION_PDF)
