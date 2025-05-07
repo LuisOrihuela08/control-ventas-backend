@@ -352,7 +352,7 @@ public class VentaController {
 
 	        document.add(Chunk.NEWLINE);
 
-	        Paragraph gracias = new Paragraph("Gracias por su compra", graciasFont);
+	        Paragraph gracias = new Paragraph("Gracias por su compra, vuelva pronto.", graciasFont);
 	        gracias.setAlignment(Element.ALIGN_CENTER);
 	        document.add(gracias);
 

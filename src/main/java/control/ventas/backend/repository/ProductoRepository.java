@@ -18,6 +18,9 @@ public interface ProductoRepository extends MongoRepository<Producto, String>{
 	//Método para buscar por nombre para registrar una venta
 	Producto findByNombreProducto(String nombre_producto);
 	
+	//Método para buscar producto por codigo
+	Producto findByCodigo(String codigo);
+	
 	//Método para filtrar producto por nombre, este se usara en el frontend como filtro
 	Page<Producto> findProductoByNombreProducto(String nombreProducto, Pageable pageable);
 	

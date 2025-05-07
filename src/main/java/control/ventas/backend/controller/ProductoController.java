@@ -116,6 +116,34 @@ public class ProductoController {
 		
 	}
 	
+	//Método para buscar producto por codigo
+	@GetMapping("/find/codigo/{codigo}")
+	public ResponseEntity<?> getProductoByCodigo(@PathVariable ("codigo") String codigo) {
+		
+		try {
+			
+			if (codigo.isBlank()) {
+				log.error("Error, el código no puede estar vacío para la búsqueda");
+				return new ResponseEntity<>(Map.of("mensaje", "Error, el código no puede estar vacío o en blanco"), HttpStatus.BAD_REQUEST);
+			}
+			
+			Producto productoEncontrado = productoService.findProductoByCodigo(codigo);
+			
+			if (productoEncontrado == null) {
+				log.error("No se encontró producto con el código: {}", codigo);
+				return new ResponseEntity<>(Map.of("mensaje", "Error, no se encontró producto con el código: " + codigo), HttpStatus.NOT_FOUND);
+			}
+			
+			log.info("Código ingresado: {}, Producto encontrado: {}", codigo, productoEncontrado);
+			return new ResponseEntity<>(productoEncontrado, HttpStatus.OK);
+			
+		} catch (Exception e) {
+			log.error("Hubo un error al encontrar producto con el código: {}", codigo, e);
+			return new ResponseEntity<>(Map.of("mensaje", "Hubo un error al encontrar producto con el código: " + codigo,
+											   "error", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	//Método para buscar producto por nombre, y es consumido desde el componente de agregar venta desde el Frontend
 	@GetMapping("/find/nombreProducto/venta/{nombreProducto}")
 	public ResponseEntity<?> getProductoByNombreForVenta(@PathVariable ("nombreProducto") String nombreProducto){
@@ -322,9 +350,9 @@ public class ProductoController {
 	        document.add(Chunk.NEWLINE);
 	        
 	     // Tabla de Productos
-	        PdfPTable table = new PdfPTable(4);
+	        PdfPTable table = new PdfPTable(5);
 	        table.setWidthPercentage(100);
-	        table.setWidths(new float[]{40, 20, 20, 20});
+	        table.setWidths(new float[]{20, 40, 20, 20, 20});
 
 	        PdfPCell header3 = new PdfPCell(new Phrase("Código", headerFont));
 	        header3.setBackgroundColor(new Color(63, 169, 219));
