@@ -1,4 +1,4 @@
-# sistema-control-ventas-backend
+# Sistema de Control de Ventas (Backend)
 
 ## Descripción
 Este repositorio contiene el backend para el sistema de control-ventas para cualquier tipo de negocio. Esta desarrollado con Java 17 y Springboot.
