@@ -414,11 +414,11 @@ public class VentaController {
 	        document.add(Chunk.NEWLINE);
 	        
 	        // Tabla del resumen de ventas
-	        PdfPTable table = new PdfPTable(5); // columnas: ID, Fecha, Total, Método de Pago, Productos vendidos
+	        PdfPTable table = new PdfPTable(6); // columnas: Fecha, Total, Dinero Cliente, Vuelto, Método de Pago, Productos vendidos
 	        table.setWidthPercentage(100);
-	        table.setWidths(new float[]{10, 10, 11, 15, 20});
+	        table.setWidths(new float[]{10, 8, 8, 8, 8, 20});
 	        
-	        String[] headers = {"ID", "Fecha", "Total", "Método de Pago", "Productos Vendidos"};
+	        String[] headers = {"Fecha", "Total", "Dinero Cliente", "Vuelto","Método de Pago", "Productos Vendidos"};
 	        for (String h : headers) {
 	            PdfPCell headerCell = new PdfPCell(new Phrase(h, headerFont));
 	            headerCell.setBackgroundColor(new Color(63, 169, 219));
@@ -428,9 +428,11 @@ public class VentaController {
 	        
 	        // Filas
 	        for (Venta venta : ventas) {
-	            table.addCell(new PdfPCell(new Phrase(venta.getId(), cellFont)));
+	            //table.addCell(new PdfPCell(new Phrase(venta.getId(), cellFont)));
 	            table.addCell(new PdfPCell(new Phrase(venta.getFechaCompra().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), cellFont)));
 	            table.addCell(new PdfPCell(new Phrase("S/." + venta.getMonto_total(), cellFont)));
+	            table.addCell(new PdfPCell(new Phrase("S/." + venta.getDinero_cliente(), cellFont)));
+	            table.addCell(new PdfPCell(new Phrase("S/." + venta.getVuelto(), cellFont)));
 	            table.addCell(new PdfPCell(new Phrase(venta.getMetodoPago(), cellFont)));
 	            //table.addCell(new PdfPCell(new Phrase(String.valueOf(venta.getProductos_vendidos().size()), cellFont)));
 	            String nombresProductos = venta.getProductos_vendidos()
@@ -591,6 +593,25 @@ public class VentaController {
 		} catch (Exception e) {
 			logger.error("ERROR al obtener el reporte: getVentaReporteByMetodoPago ", e);
 			return new ResponseEntity<>(Map.of("detalle", "Error al obtener el reporte de venta por metodo de pago", "error", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	//Este método es para obtener una lista de Métodos de pago
+	@GetMapping("/metodos-pago")
+	public ResponseEntity<?> getMetodosPagos(){
+		
+		try {
+			
+			List<String> metodosPago = List.of("Yape", "Efectivo", "Tarjeta", "Plin");
+			
+			logger.info("Métodos de Pago listados OK!");
+			return ResponseEntity.ok(metodosPago);
+					
+			
+		} catch (Exception e) {
+			logger.error("Error al listar los Métodos de Pago {}", e);
+			return new ResponseEntity<>(Map.of("detalle", "Error al listar los Método de pago",
+											   "error", e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }
