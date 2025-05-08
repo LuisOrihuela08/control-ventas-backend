@@ -51,6 +51,13 @@ Este repositorio contiene el backend para el sistema de control-ventas para cual
 ## Reporte de Inventario de Productos en Excel
 ![Image](https://github.com/user-attachments/assets/11767f79-c034-4d82-b042-5edb0078bc3a)
 
+## Frontend para la API
+   ```bash
+   https://github.com/LuisOrihuela08/control-ventas-frontend.git
+   ```
 
+## 👨‍💻 Autor
+Luis Orihuela Orozco | 
+Backend Developer - 2025
 
 
