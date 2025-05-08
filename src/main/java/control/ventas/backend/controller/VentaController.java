@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -373,7 +374,99 @@ public class VentaController {
 	    }
 	}
 
-	
+	@GetMapping("/export/pdf/rango")
+	public ResponseEntity<InputStreamResource> exportVentasPDFPorRango(@RequestParam ("fechaInicio") String fechaInicio,
+															           @RequestParam ("fechaFin") String fechaFin){
+		
+		try {
+			
+			List<Venta> ventas = ventaService.findVentaByFechaCompraBetween(fechaInicio, fechaFin);
+			
+			if (ventas.isEmpty()) {
+				logger.error("No se encontró ventas entre los rangos de fechaInicio: {}, fechaFin: {}", fechaInicio, fechaFin);
+				return ResponseEntity.noContent().build();	
+				}
+			
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+	        Document document = new Document(PageSize.A4.rotate(), 30, 30, 30, 30); // Horizontal para más espacio
+	        PdfWriter.getInstance(document, out);
+
+	        document.open();
+	        
+	        //Estilos
+	        Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD, Color.WHITE);
+	        Font headerFont = new Font(Font.HELVETICA, 12, Font.BOLD, Color.WHITE);
+	        Font cellFont = new Font(Font.HELVETICA, 10, Font.NORMAL, Color.BLACK);
+			
+	        // Título del reporte
+	        PdfPTable headerTable = new PdfPTable(1);
+	        PdfPCell cell = new PdfPCell(new Phrase("REPORTE DE VENTAS", titleFont));
+	        cell.setBackgroundColor(new Color(63, 169, 219));
+	        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        cell.setPadding(10);
+	        headerTable.addCell(cell);
+	        headerTable.setSpacingAfter(15f);
+	        document.add(headerTable);
+	        
+	        // Información del rango
+	        document.add(new Paragraph("Rango de fechas: " + fechaInicio + " a " + fechaFin, cellFont));
+	        document.add(new Paragraph("Total de ventas: " + ventas.size(), cellFont));
+	        document.add(Chunk.NEWLINE);
+	        
+	        // Tabla del resumen de ventas
+	        PdfPTable table = new PdfPTable(5); // columnas: ID, Fecha, Total, Método de Pago, Productos vendidos
+	        table.setWidthPercentage(100);
+	        table.setWidths(new float[]{10, 10, 11, 15, 20});
+	        
+	        String[] headers = {"ID", "Fecha", "Total", "Método de Pago", "Productos Vendidos"};
+	        for (String h : headers) {
+	            PdfPCell headerCell = new PdfPCell(new Phrase(h, headerFont));
+	            headerCell.setBackgroundColor(new Color(63, 169, 219));
+	            headerCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+	            table.addCell(headerCell);
+	        }
+	        
+	        // Filas
+	        for (Venta venta : ventas) {
+	            table.addCell(new PdfPCell(new Phrase(venta.getId(), cellFont)));
+	            table.addCell(new PdfPCell(new Phrase(venta.getFechaCompra().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), cellFont)));
+	            table.addCell(new PdfPCell(new Phrase("S/." + venta.getMonto_total(), cellFont)));
+	            table.addCell(new PdfPCell(new Phrase(venta.getMetodoPago(), cellFont)));
+	            //table.addCell(new PdfPCell(new Phrase(String.valueOf(venta.getProductos_vendidos().size()), cellFont)));
+	            String nombresProductos = venta.getProductos_vendidos()
+	                    .stream()
+	                    .map(Producto::getNombreProducto)
+	                    .collect(Collectors.joining(", "));
+
+	                table.addCell(new PdfPCell(new Phrase(nombresProductos, cellFont)));
+	        }
+	        
+	        document.add(table);
+
+	        document.add(Chunk.NEWLINE);
+	        Paragraph gracias = new Paragraph("Reporte generado automáticamente por el sistema. Store Luiz S.A.C", new Font(Font.HELVETICA, 12, Font.ITALIC));
+	        gracias.setAlignment(Element.ALIGN_CENTER);
+	        document.add(gracias);
+
+	        document.close();
+
+	        ByteArrayInputStream bis = new ByteArrayInputStream(out.toByteArray());
+	        HttpHeaders headersHttp = new HttpHeaders();
+	        headersHttp.add("Content-Disposition", "attachment; filename=reporte_ventas_" + fechaInicio + "_a_" + fechaFin + ".pdf");
+
+	        logger.info("Reporte PDF de Ventas por fechas OK!");
+	        return ResponseEntity.ok()
+	                .headers(headersHttp)
+	                .contentType(MediaType.APPLICATION_PDF)
+	                .body(new InputStreamResource(bis));
+			
+		} catch (Exception e) {
+			logger.error("Error al crear el reporte PDF de ventas entre fechas {}", e);
+			e.printStackTrace();
+	        return ResponseEntity.internalServerError().build();
+		}
+		
+	}
 
 	@GetMapping("/find-venta/{id}")
 	public ResponseEntity<?> getVentaById(@PathVariable("id") String id) {
