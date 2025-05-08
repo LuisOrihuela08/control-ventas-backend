@@ -17,6 +17,9 @@ public interface VentaRepository extends MongoRepository<Venta, String>{
 	//Método para filtro ventas por fecha
 	Page<Venta> findVentaByFechaCompraBetween(LocalDateTime fechaInicio, LocalDateTime fechaFin, Pageable pageable);
 
+	//Método para filtrar ventas entre fechas, para reporte de PDF
+	List<Venta> findByFechaCompraBetween(LocalDateTime  fechaInicio, LocalDateTime fechaFin);
+	
 	//Paginar las ventas
 	Page<Venta> findAll(Pageable pageable);
 	

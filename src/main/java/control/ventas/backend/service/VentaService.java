@@ -88,6 +88,20 @@ public class VentaService {
 		}
 		
 	}
+	//Método para generar PDF ventas entre fechas
+	public List<Venta> findVentaByFechaCompraBetween(String fechaInicioString, String fechaFinString){
+		
+		try {
+			LocalDateTime fechaInicio = LocalDate.parse(fechaInicioString).atStartOfDay();
+	        LocalDateTime fechaFin = LocalDate.parse(fechaFinString).plusDays(1).atStartOfDay();
+			
+			return ventaRepository.findByFechaCompraBetween(fechaInicio, fechaFin);
+			
+		} catch (Exception e) {
+			log.error("Error al buscar ventas por fechas: {}", e, e.getMessage());
+			throw new RuntimeException("Error, al buscar ventas por fechas: " + e.getMessage());
+		}
+	}
 	
 	//Método para paginar las ventas
 	public Page<Venta> listVentaByPages(int page, int size){
