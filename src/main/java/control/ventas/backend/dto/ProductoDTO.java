@@ -15,4 +15,5 @@ public class ProductoDTO {
 	private double precio_unitario;
 	private double subtotal;
 	private String marca;
+	private String descripcion;
 }

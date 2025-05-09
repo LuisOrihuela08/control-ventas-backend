@@ -34,7 +34,15 @@ public interface ProductoRepository extends MongoRepository<Producto, String>{
 	//Lo utilizo para importar el excel
 	boolean existsByNombreProducto(String nombreProducto);
 	
+	/////////////////////////////////
 	//Esto es para importar excel, pero para verificar si el producto existe por nombre
 	//y actualizar los registros
 	Optional<Producto> getByNombreProducto (String nombreProducto);
+	
+	//Al final solo estoy usando esto para verificar si el producto existe e importar en el excel
+	Optional<Producto> getByCodigo (String codigo);
+	
+	//Con esto no solo verifico el nombre sino tambien el codigo, para mas seguridad al importar el excel
+	Optional<Producto> findByNombreProductoAndCodigo(String nombreProducto, String codigo);
+
 }

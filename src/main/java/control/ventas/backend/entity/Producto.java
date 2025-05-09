@@ -24,6 +24,7 @@ public class Producto {
 	private double precio_unitario;
 	private double subtotal;
 	private String marca;
+	private String descripcion;
 	
 	
 	//Este constructor es para el Test Unitario
