@@ -217,6 +217,7 @@ public class ProductoController {
 			producto.setCantidad(productoDTO.getCantidad());
 			producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
 			producto.setMarca(productoDTO.getMarca());
+			producto.setDescripcion(productoDTO.getDescripcion());
 			productoService.saveProducto(producto);
 			
 			log.info("Producto Registrado OK {}", producto);
@@ -247,6 +248,7 @@ public class ProductoController {
 			producto.setMarca(productoDTO.getMarca());
 			producto.setCantidad(productoDTO.getCantidad());
 			producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
+			producto.setDescripcion(productoDTO.getDescripcion());
 			
 			productoService.saveProducto(producto);
 			
@@ -314,7 +316,8 @@ public class ProductoController {
 			List<Producto> listProducto = productoService.findAllProductos();
 			
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			Document document = new Document(PageSize.A4, 50, 50, 50, 50);
+			//Document document = new Document(PageSize.A4, 50, 50, 50, 50);//Esto estilo Hoja vertical
+			Document document = new Document(PageSize.A4.rotate(), 30, 30, 30, 30); // Horizontal para más espacio
 			PdfWriter.getInstance(document, out);
 			
 			document.open();
@@ -323,7 +326,7 @@ public class ProductoController {
 			Font titleFont = new Font(Font.HELVETICA, 20, Font.BOLD, Color.WHITE);
 			Font infoFont = new Font(Font.HELVETICA, 12, Font.NORMAL, Color.DARK_GRAY);
 	        Font headerFont = new Font(Font.HELVETICA, 14, Font.BOLD, Color.WHITE);
-	        Font montosFont = new Font(Font.HELVETICA, 14, Font.BOLD, Color.BLACK);
+	        Font montosFont = new Font(Font.HELVETICA, 14, Font.NORMAL, Color.BLACK);
 	        Font graciasFont = new Font(Font.HELVETICA, 14, Font.BOLD, Color.getHSBColor(0.54f, 0.71f, 0.86f));
 
 	        // Encabezado Mejorado
@@ -350,9 +353,10 @@ public class ProductoController {
 	        document.add(Chunk.NEWLINE);
 	        
 	     // Tabla de Productos
-	        PdfPTable table = new PdfPTable(5);
+	        PdfPTable table = new PdfPTable(6);
 	        table.setWidthPercentage(100);
-	        table.setWidths(new float[]{20, 40, 20, 20, 20});
+	       // table.setWidths(new float[]{20, 40, 30, 30, 20, 40}); //Esto es para estilo Hoja vertical
+	        table.setWidths(new float[]{10, 8, 8, 8, 8, 20});
 
 	        PdfPCell header3 = new PdfPCell(new Phrase("Código", headerFont));
 	        header3.setBackgroundColor(new Color(63, 169, 219));
@@ -378,6 +382,11 @@ public class ProductoController {
 	        header7.setBackgroundColor(new Color(63, 169, 219));
 	        header7.setHorizontalAlignment(Element.ALIGN_CENTER);
 	        table.addCell(header7);
+	        
+	        PdfPCell header8 = new PdfPCell(new Phrase("Descripción", headerFont));
+	        header8.setBackgroundColor(new Color(63, 169, 219));
+	        header8.setHorizontalAlignment(Element.ALIGN_CENTER);
+	        table.addCell(header8);
 
 	        
 	        
@@ -399,9 +408,13 @@ public class ProductoController {
 	            cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
 	            table.addCell(cell4);
 
-	            PdfPCell cell5 = new PdfPCell(new Phrase(String.format("%.2f", producto.getPrecio_unitario()), montosFont));
+	            PdfPCell cell5 = new PdfPCell(new Phrase("S/." + String.format("%.2f", producto.getPrecio_unitario()), montosFont));
 	            cell5.setHorizontalAlignment(Element.ALIGN_CENTER);
 	            table.addCell(cell5);
+	            
+	            PdfPCell cell6 = new PdfPCell(new Phrase(String.valueOf(producto.getDescripcion()), montosFont));
+	            cell6.setHorizontalAlignment(Element.ALIGN_CENTER);
+	            table.addCell(cell6);
 
 	            
 	        }

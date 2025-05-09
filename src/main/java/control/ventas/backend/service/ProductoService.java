@@ -111,7 +111,7 @@ public class ProductoService {
 		Sheet sheet = workbook.createSheet("Inventario de Productos");
 
 		Row headerRow = sheet.createRow(0);
-		String[] columnas = { "ID", "Código", "Nombre Producto", "Marca", "Precio Unitario", "Cantidad" };
+		String[] columnas = {"Código", "Nombre Producto", "Marca", "Precio Unitario", "Cantidad", "Descripción" };
 
 		for (int i = 0; i < columnas.length; i++) {
 			Cell cell = headerRow.createCell(i);
@@ -123,13 +123,14 @@ public class ProductoService {
 		int rowNum = 1;
 		for (Producto producto : productos) {
 			Row row = sheet.createRow(rowNum++);
-			row.createCell(0).setCellValue(producto.getId());
-			row.createCell(1).setCellValue(producto.getCodigo());
-			row.createCell(2).setCellValue(producto.getNombreProducto());
-			row.createCell(3).setCellValue(producto.getMarca());
-			row.createCell(4).setCellValue(producto.getPrecio_unitario());
+			//row.createCell(0).setCellValue(producto.getId());
+			row.createCell(0).setCellValue(producto.getCodigo());
+			row.createCell(1).setCellValue(producto.getNombreProducto());
+			row.createCell(2).setCellValue(producto.getMarca());
+			row.createCell(3).setCellValue("S/." + producto.getPrecio_unitario());
 			// row.createCell(4).setCellValue(producto.getSubtotal());
-			row.createCell(5).setCellValue(producto.getCantidad());
+			row.createCell(4).setCellValue(producto.getCantidad());
+			row.createCell(5).setCellValue(producto.getDescripcion());
 		}
 
 		// Esto es para ajustar el tamaño de las columnas
@@ -172,6 +173,7 @@ public class ProductoService {
 				String marca = getCellValue(row.getCell(6)); // Columna G
 				String precioUnitarioStr = getCellValue(row.getCell(9)); // Columna J
 				String cantidadStr = getCellValue(row.getCell(11)); // Columna L
+				String descripcion = getCellValue(row.getCell(13));// Columna N
 
 				if (nombreProducto == null || nombreProducto.isEmpty())
 					continue;
@@ -192,15 +194,20 @@ public class ProductoService {
 
 				// Esto no solo verifica si existe por nombre el producto
 				// Sino que actualiza los registros como cantidad, marca, precio
-				Optional<Producto> productoExistenteOpt = productoRepository.getByNombreProducto(nombreProducto);
+				//Optional<Producto> productoExistenteOpt = productoRepository.getByNombreProducto(nombreProducto);
 
+				//Optional<Producto> productoExistenteOpt = productoRepository.findByNombreProductoAndCodigo(nombreProducto, codigo);
+				
+				Optional<Producto> productoExistenteOpt = productoRepository.getByCodigo(codigo);
+				
 				if (productoExistenteOpt.isPresent()) {
 					Producto productoExistente = productoExistenteOpt.get();
 					productoExistente.setCodigo(codigo);
 					productoExistente.setCantidad(productoExistente.getCantidad() + cantidad);
 					productoExistente.setPrecio_unitario(precio); // Puedes comentar esta línea si no quieres actualizar
 																	// el precio
-					productoExistente.setMarca(marca); // Igual con la marca
+					productoExistente.setMarca(marca); // Igual con la marca 
+					productoExistente.setDescripcion(descripcion);
 					productos.add(productoExistente);
 				} else {
 					Producto nuevoProducto = new Producto();
@@ -209,6 +216,7 @@ public class ProductoService {
 					nuevoProducto.setMarca(marca);
 					nuevoProducto.setPrecio_unitario(precio);
 					nuevoProducto.setCantidad(cantidad);
+					nuevoProducto.setDescripcion(descripcion);
 					productos.add(nuevoProducto);
 				}
 
