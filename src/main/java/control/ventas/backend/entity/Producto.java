@@ -28,6 +28,7 @@ public class Producto {
 	
 	
 	//Este constructor es para el Test Unitario
+	/*
 	public Producto(String nombreProducto, String codigo, int cantidad, double precio_unitario, String marca) {
 		super();
 		this.nombreProducto = nombreProducto;
@@ -36,4 +37,19 @@ public class Producto {
 		this.precio_unitario = precio_unitario;
 		this.marca = marca;
 	}
+*/
+
+	public Producto(String id, String nombreProducto, String codigo, int cantidad, double precio_unitario, String marca,
+			String descripcion) {
+		super();
+		this.id = id;
+		this.nombreProducto = nombreProducto;
+		this.codigo = codigo;
+		this.cantidad = cantidad;
+		this.precio_unitario = precio_unitario;
+		this.marca = marca;
+		this.descripcion = descripcion;
+	}
+	
+	
 }

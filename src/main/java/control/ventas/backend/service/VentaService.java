@@ -3,6 +3,7 @@ package control.ventas.backend.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,20 +38,23 @@ public class VentaService {
 			
 			//Antes de guardar una venta, voy a verificar si el producto tiene stock
 			for(Producto productoVendido: venta.getProductos_vendidos()) {
-				Producto productoBD = productoRepository.findByNombreProducto(productoVendido.getNombreProducto());
+				System.out.println("Buscando producto: " + productoVendido.getCodigo());
+				//Verifico si el producto existe por su codigo
+				Optional<Producto> optionalProducto = productoRepository.getByCodigo(productoVendido.getCodigo());
 				
-				if (productoBD == null) {
-					throw new IllegalArgumentException("El producto: " + productoVendido.getNombreProducto() + " no existe");
+				if (optionalProducto.isEmpty()) {
+					throw new IllegalArgumentException("El producto con el códgio: " + productoVendido.getCodigo() + " no existe");
 				}
 				
-				if (productoBD.getCantidad() < productoVendido.getCantidad()) {
+				Producto productoDB = optionalProducto.get();
+				if (productoDB.getCantidad() < productoVendido.getCantidad()) {
 					throw new IllegalArgumentException("Stock insuficiente para el producto " + productoVendido.getNombreProducto());
 				}
 			}
 			
 			//Y aca restamos el stock y actualizamos los productos
 			for(Producto productoVendido: venta.getProductos_vendidos()) {
-				Producto productoBD = productoRepository.findByNombreProducto(productoVendido.getNombreProducto());
+				Producto productoBD = productoRepository.getByCodigo(productoVendido.getCodigo()).get();
 				productoBD.setCantidad(productoBD.getCantidad() - productoVendido.getCantidad());
 				productoRepository.save(productoBD);
 			}
