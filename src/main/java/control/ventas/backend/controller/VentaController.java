@@ -120,10 +120,13 @@ public class VentaController {
 	        
 	        for (ProductoDTO productoDTO : ventaDTO.getProductos_vendidos()) {
 	            Producto producto = new Producto();
+	            producto.setId(productoDTO.getId());
+	            producto.setCodigo(productoDTO.getCodigo());
 	            producto.setNombreProducto(productoDTO.getNombreProducto());
 	            producto.setCantidad(productoDTO.getCantidad());
 	            producto.setPrecio_unitario(productoDTO.getPrecio_unitario());
 	            producto.setMarca(productoDTO.getMarca());
+	            producto.setDescripcion(productoDTO.getDescripcion());
 
 	            // Calculamos subtotal por producto
 	            double subtotal = productoDTO.getCantidad() * productoDTO.getPrecio_unitario();
